@@ -1,0 +1,24 @@
+name: Spawn
+main: joren.spawn.Spawn
+version: 0.1
+description: A special version of SpawnMobLite
+commands:
+  spawn:
+    description:
+    usage:
+  sp:
+    description:
+    usage:
+  s:
+    description:
+    usage:
+  spawn-admin:
+    description:
+    usage:
+  sp-admin:
+    description:
+    usage:
+  s-admin:
+    description:
+    usage:
+  
