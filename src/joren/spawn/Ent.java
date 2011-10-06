@@ -201,7 +201,7 @@ public class Ent {
 					}
 					else
 					{
-						healthMethod.invoke(healthValue);
+						healthMethod.invoke(ent, healthValue);
 						if (ent instanceof ExperienceOrb)
 							((ExperienceOrb)ent).setExperience(healthValue);
 					}
