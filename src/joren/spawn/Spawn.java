@@ -28,11 +28,13 @@ import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 
 /**
- * SpawnMobLite - Main
+ * Spawn
  * @version 0.1
  * @author jorencombs
  * 
- * Made with much rewriting of code; original SpawnMob Bukkit adaptation by jordanneil23.
+ * Originally intended to be a stripped-down version of the SpawnMob Bukkit plugin (most recently adapted
+ * by jordanneil23).  However, it has been nuked and rewritten enough that there probably isn't much of
+ * the original code left.  Also uses TargetBlock code from toi and Raphfrk
  */
 public class Spawn extends JavaPlugin {
 	public java.util.logging.Logger log = java.util.logging.Logger.getLogger("Minecraft");
@@ -45,6 +47,10 @@ public class Spawn extends JavaPlugin {
 	protected boolean permissions = false;
 	protected int spawnLimit, sizeLimit;
 
+	/**
+	 * Initializes plugin description variables (in case they are different from when written)
+	 * and initiates a reload of the plugin
+	 */
 	public void onEnable()
 	{
 		PluginDescriptionFile pdfFile = this.getDescription();
@@ -56,17 +62,22 @@ public class Spawn extends JavaPlugin {
 		info("Version " + pdfFile.getVersion() + " enabled.");
 	}
 	
+	/**
+	 * Disables the plugin.  Initializes plugin description variables (in case they are different from
+	 * when written) and initiates a reload of the plugin
+	 */
 	public void onDisable() {
 		save();
-		PluginDescriptionFile pdfFile = this.getDescription();
-		log.info( header + "Version " + pdfFile.getVersion() + " disabled.");
+		log.info("Disabled.");
 	}
 
-	/*
-	 * Reloads the plugin by re-reading the configuration file.
+	/**
+	 * Reloads the plugin by re-reading the configuration file and setting associated variables
 	 * 
-	 * Precondition: Variable 'file' is specified.
-	 * Postcondition: The configuration will be replaced with whatever information is in the file.  Any variables that need to be read from the configuration will be initialized.  Returns true if successful, false otherwise.
+	 * The configuration will be replaced with whatever information is in the file.  Any variables that need to be read from the configuration will be initialized.
+	 * 
+	 * @return boolean: True if reload was successful.  Currently all reloads are considered successful
+	 * since there are fallbacks for cases where the configuration isn't there.
 	 */
 	public boolean reload()
 	{
@@ -96,11 +107,10 @@ public class Spawn extends JavaPlugin {
 		return true;
 	}
 
-	/*
-	 * Saves a new default configuration file, overwriting old configuration and file in the process.
-	 * 
-	 * Precondition: The configuration file needs to be writable.
-	 * Postcondition: Any existing configuration will be replaced with the default configuration and saved to disk.  Any variables that need to be read from the configuration will be initialized.  Returns true if successful, false otherwise.
+	/**
+	 * Saves a new default configuration file, overwriting old configuration and file in the process
+	 * Any existing configuration will be replaced with the default configuration and saved to disk.  Any variables that need to be read from the configuration will be initialized
+	 * @return boolean: True if successful, false otherwise
 	 */
 	public boolean saveDefault()
 	{
@@ -118,11 +128,10 @@ public class Spawn extends JavaPlugin {
 			return false;
 	}
 	
-	/*
+	/**
 	 * Saves the configuration file, overwriting old file in the process
 	 * 
-	 * Precondition: The configuration file needs to be readable.
-	 * Postcondition: Configuration will be saved to disk.  Returns true if successful, false otherwise.
+	 * @return boolean: True if successful, false otherwise.
 	 */
 	public boolean save()
 	{
@@ -148,8 +157,15 @@ public class Spawn extends JavaPlugin {
 		return true;
 	}
 	
-	/*
-	 * For whatever reason, avoid ever allowing this entity type to be spawned.
+	/**
+	 * Sets a flag intended to prevent this entity from ever being spawned by this plugin
+	 * 
+	 * This is intended for situations where the entity threw an exception indicating that the
+	 * game really, really, really was not happy about being told to spawn that entity.  Flagging
+	 * this entity is supposed to stop any player (even the admin) from spawning this entity
+	 * regardless of permissions, aliases, etc.
+	 * 
+	 * @param ent - The entity class.  No instance of this class will be spawned using this plugin
 	 */
 	
 	public void flag(Class<Entity> ent)
@@ -158,7 +174,21 @@ public class Spawn extends JavaPlugin {
 			cfg.setProperty("Avoid." + ent.getSimpleName(), true);
 	}
 	
-	public Player[] lookupPlayers(String alias, CommandSender sender, String permsPrefix)
+	/**
+	 * Utility function; returns a list of players associated with the supplied alias.
+	 * 
+	 * This can be restricted by permissions in two ways:  permission can be denied for a specific
+	 * alias, or permission can be denied for spawning players in general.  User should be aware that
+	 * if permission is denied on alias Derp, but there is a player named DerpIsDerp, a list
+	 * containing a single player named DerpIsDerp will be returned.
+	 * 
+	 * @param alias: An alias/name associated with one or more players
+	 * @param sender: The person who asked for the alias
+	 * @param permsPrefix: The intended purpose of this list, used as a permissions prefix
+	 * @return Player[]: A list of players.  If no players were found, returns a size 0 array (not null)
+	 */
+	
+	protected Player[] lookupPlayers(String alias, CommandSender sender, String permsPrefix)
 	{
 		ArrayList<Player> list = new ArrayList<Player>();
 		Player[] derp = new Player[0];//Needed for workaround below
@@ -186,6 +216,18 @@ public class Spawn extends JavaPlugin {
 		return list.toArray(derp); // what a ridiculous workaround
 	}
 
+	/**
+	 * Utility function; returns a list of entity classes associated with the supplied alias.
+	 * 
+	 * This can be restricted by permissions on each entity type (NOT by alias type).  If player
+	 * has permissions for only some of the entities indicated by an alias, a partial list will
+	 * be returned.
+	 * 
+	 * @param alias: An alias/name associated with one or more entity types
+	 * @param sender: The person who asked for the alias
+	 * @param permsPrefix: The intended purpose of this list, used as a permissions prefix
+	 * @return Player[]: A list of players.  If no players were found, returns a size 0 array (not null)
+	 */
 	public Class<Entity>[] lookup(String alias, CommandSender sender, String permsPrefix)
 	{
 		ArrayList<Class<Entity>> list = new ArrayList<Class<Entity>>();
@@ -197,7 +239,7 @@ public class Spawn extends JavaPlugin {
 			if (alias.length() > 18)
 				alias = alias.substring(17);
 			else
-				return (Class<Entity>[]) list.toArray(derp);
+				return (Class<Entity>[]) list.toArray(derp);//an empty list since they didn't finish specifying the class
 		}
 		ConfigurationNode node = cfg.getNode("Alias." + alias.toLowerCase());
 		if (node!=null)	
@@ -243,6 +285,15 @@ public class Spawn extends JavaPlugin {
 		return (Class<Entity>[]) list.toArray(derp); // what a ridiculous workaround
 	}
 	
+	/**
+	 * A ridiculously complicated function for handling player commands
+	 * @param sender: The person sending the command
+	 * @param command: The command being called
+	 * @param commandLabel: Dunno what the difference is between this and command.getName()
+	 * @param args: The list of arguments given for the command
+	 * 
+	 * @return boolean: True if successful (also indicates player used syntax correctly), false otherwise
+	 */
 	public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args)
 	{
 		int[] ignore = {8, 9};
@@ -821,6 +872,11 @@ public class Spawn extends JavaPlugin {
 		return false;
 	}
 	
+	/**
+	 * Prints help in accordance with the player's permissions
+	 * 
+	 * @param sender: The person being "helped"
+	 */
 	public void printHelp(CommandSender sender)
 	{
 		if (allowedTo(sender, "spawn.admin"))
@@ -917,7 +973,12 @@ public class Spawn extends JavaPlugin {
 		}
 	}
 
-	
+	/**
+	 * Probably the only leftover from SpawnMob.  Should replace with a PluginListener...
+	 * 
+	 * Tests to see if permissions is working; if so, sets our Permissions handle so we can access it.
+	 * Otherwise, sets permissions to false.
+	 */
 	private void setupPermissions()
 	{
 		Plugin test = this.getServer().getPluginManager().getPlugin("Permissions");
@@ -933,8 +994,11 @@ public class Spawn extends JavaPlugin {
 		}
 	}
 	
-	/*
-	 * returns true if player has the permission node or if player is an op.
+	/**
+	 * Checks to see if sender has permission OR is an op.  If not using permissions, only op is tested.
+	 * @param sender: The person whose permission is being checked
+ 	 * @param permission The permission being checked (e.g. "exampleplugin.examplepermnode")
+	 * @returns boolean: True if player has the permission node OR if player is an op
 	 */
 	boolean allowedTo(CommandSender sender, String permission)
 	{
@@ -945,8 +1009,14 @@ public class Spawn extends JavaPlugin {
 		return false;
 	}
 	
-	/*
-	 * Test to see whether type (usually a CraftBukkit Entity of some kind) uses any of the (Bukkit) interfaces in types.  (e.g. is this in our list of creature types we want to work on?)
+	/**
+	 * Test to see whether type (usually a CraftBukkit Entity of some kind) uses any of the (Bukkit)
+	 * interfaces in types.  (e.g. CraftCow implements Cow).  Useful for determining if an entity
+	 * is in our list of creature types we want to work on.
+	 * 
+	 * @param types: A list of types that is being used to filter Entities
+	 * @param type: The type being filtered
+	 * @return boolean: True if type uses any of the types as an Interface
 	 */
 	private boolean hasClass(Class<Entity>[] types, Class<? extends Entity> type)
 	{
@@ -957,8 +1027,11 @@ public class Spawn extends JavaPlugin {
 		return false;
 	}
 	
-	/*
-	 * Test to see whether subject is in array
+	/**
+	 * Tests to see whether subject exists as a member of array.
+	 * @param subject: An object being filtered
+	 * @param array: A list of objects being used as a filter
+	 * @return boolean: True if array has subject in it
 	 */
 	private boolean existsIn(Object subject, Object[] array)
 	{
@@ -968,8 +1041,25 @@ public class Spawn extends JavaPlugin {
 		return false;
 	}
 	
-	/*
-	 * If the entity meets the criteria for slaughter, removes it and returns true.
+	/**
+	 * Determines if an entity meets the criteria for slaughter.  If so, removes it.
+	 * @param types: The types of entity referred to by the alias
+	 * @param angry: If true, only kills angry entities
+	 * @param color: If true, only kills entities of a specific colorCode 
+	 * @param colorCode: Used to decide what color of entity to kill (e.g. only kill blue sheep).
+	 * @param fire: If true, only kills burning entities
+	 * @param health: If true, only kills entities of a specific health value
+	 * @param healthValue: Used to decide exactly how healthy an entity needs to be to die
+	 * @param mount: If true, will only kill mounted entities (e.g. saddled pigs)
+	 * @param owned: If true, will only kill owned entities (e.g. owned wolves) (default is to IGNORE owned entities, use carefully!)
+	 * @param owner: If set and owned is true, only kills entities owned by that player.  If set to null and owned is true, kills ALL owned entities
+	 * @param naked: If true, only kills naked entities (e.g. sheared sheep)
+	 * @param size: If true, only kills entities of a specific size
+	 * @param sizeValue: Used to decide exactly how big an entity needs to be to die
+	 * @param target: If true, only kills entities that currently have a target
+	 * @param targets: If set and target is true, only killed entities with these targets.  If null and target is true, kills entities with ANY target
+	 * 
+	 * @return boolean: true is ent was killed, false if it lived
 	 */
 	private boolean KillSingle(Entity ent, Class<Entity>[] types, boolean angry, boolean color, DyeColor colorCode, boolean fire, boolean health, int healthValue, boolean mount, boolean naked, boolean owned, AnimalTamer[] owner, boolean size, int sizeValue, boolean target, Player[] targets)
 	{
@@ -1121,8 +1211,28 @@ public class Spawn extends JavaPlugin {
 		return false;
 	}
 	
-	/* 
-	 * Searches for and kills all entities that meet the specified criteria.
+	/**
+	 * Searches for and kills all entities that meet the specified criteria and returns a body count
+	 * 
+	 * @param sender: The person who sent out the hit.  Used for radius parameter.
+	 * @param types: The types of entity referred to by the alias
+	 * @param radius: If positive, only kills entities within radius of sender.  Will throw casting exception if positive and sender is the console.
+	 * @param angry: If true, only kills angry entities
+	 * @param color: If true, only kills entities of a specific colorCode 
+	 * @param colorCode: Used to decide what color of entity to kill (e.g. only kill blue sheep).
+	 * @param fire: If true, only kills burning entities
+	 * @param health: If true, only kills entities of a specific health value
+	 * @param healthValue: Used to decide exactly how healthy an entity needs to be to die
+	 * @param mount: If true, will only kill mounted entities (e.g. saddled pigs)
+	 * @param owned: If true, will only kill owned entities (e.g. owned wolves) (default is to IGNORE owned entities, use carefully!)
+	 * @param owner: If set and owned is true, only kills entities owned by that player.  If set to null and owned is true, kills ALL owned entities
+	 * @param naked: If true, only kills naked entities (e.g. sheared sheep)
+	 * @param size: If true, only kills entities of a specific size
+	 * @param sizeValue: Used to decide exactly how big an entity needs to be to die
+	 * @param target: If true, only kills entities that currently have a target
+	 * @param targets: If set and target is true, only killed entities with these targets.  If null and target is true, kills entities with ANY target
+	 * 
+	 * @return int: how many entities were slain
 	 */
 	public int Kill(CommandSender sender, Class<Entity>[] types, int radius, boolean angry, boolean color, DyeColor colorCode, boolean fire, boolean health, int healthValue, boolean mount, boolean naked, boolean owned, Player[] owner, boolean size, int sizeValue, boolean target, Player[] targets)
 	{
@@ -1155,18 +1265,40 @@ public class Spawn extends JavaPlugin {
 		return bodycount;
 	}
 	
+	/**
+	 * Logs an informative message to the console, prefaced with this plugin's header
+	 * @param message: String
+	 */
 	protected void info(String message)
 	{
 		log.info(header + message);
 	}
+
+	/**
+	 * Logs a severe error message to the console, prefaced with this plugin's header
+	 * Used to log severe problems that have prevented normal execution of the plugin
+	 * @param message: String
+	 */
 	protected void severe(String message)
 	{
 		log.severe(header + message);
 	}
+
+	/**
+	 * Logs a warning message to the console, prefaced with this plugin's header
+	 * Used to log problems that could interfere with the plugin's ability to meet admin expectations
+	 * @param message: String
+	 */
 	protected void warning(String message)
 	{
 		log.warning(message);
 	}
+
+	/**
+	 * Logs a message to the console, prefaced with this plugin's header
+	 * @param level: Logging level under which to send the message
+	 * @param message: String
+	 */
 	protected void log(java.util.logging.Level level, String message)
 	{
 		log.log(level, header + message);

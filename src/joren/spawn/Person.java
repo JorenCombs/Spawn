@@ -6,23 +6,43 @@ import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+
+/**
+ * Person class intended to facilitate the use of Players within a spawning sequences indicated by an Ent
+ * @author Joren Combs
+ * @version 0.1
+ * @see Ent
+ */
 public class Person extends Ent {
 
 	private Player[] people;
 	
-	/*
-	 * Describes the kind of mob you want to spawn.
-	 * @param type: the type of mob
-	 * @param passenger: What mob will be riding this one; if none, null
-	 * @param size: Size for slimes; ignored if not a slime
-	 * @param health: Health for mobs
-	 * @param healthPercentage: true if health should be taken as a percentage of normal health
-	 * @param fireTicks: How many ticks the mob will burn (needs to be really, really, high)
-	 * @param velocity: How fast you want the mob to be going when it spawns
-	 * @param angry: is the mob angry or not?
-	 * @param setAngry: Should we manually set the angry parameter, or leave it at the mob type's default?
+	/**
+	 * A Player is basically an Ent meant to allow Players to be a part of your spawning sequence.
+	 * Although most of these options are not supported by the Player class, that may change some day;
+	 * they are left here in case that ever happens.
+	 * 
+	 * @param people: The players referred to by the alias
+	 * @param alias: The name given to this collection of players
+	 * @param angry: If true, entity will be made angry
+	 * @param bounce: If true, the (projectile) entity will be made to bounce.  So far, no observable effect
+	 * @param color: If true, will set the entity's color to specified colorCode 
+	 * @param colorCode: Used to decide the entity's color if entity supports more than one color
+	 * @param fireTicks: How many ticks the entity will burn (20 ticks/second)
+	 * @param health: If true, will set the entity's health using healthValue
+	 * @param healthPercentage: True if healthValue should be taken as a percentage of normal health
+	 * @param healthValue: Used to set the entity's health if the entity supports it
+	 * @param mount: If true, will make the entity have a mount (e.g. saddle for pig) if it is supported
+	 * @param owned: If true, the entity will belong to Owner
+	 * @param owner: Used to set the entity's owner if entity supports ownership
+	 * @param naked: If true, will strip the entity of clothes/wool
+	 * @param passenger: What entity will be riding this one; if none, null
+	 * @param size: If true, will set the entity's size to sizeValue
+	 * @param sizeValue: If the entity supports it, can be used to set the entity's size
+	 * @param target: If true, entity will have a target.  Does not seem to work for ghasts
+	 * @param targets: A list of potential targets for the entity to choose from
+	 * @param velocity: How fast you want the entity to be going when it spawns
 	 */
-
 	public Person(Player[] people, String alias, boolean angry, boolean bounce, boolean color, DyeColor colorCode, int fireTicks, boolean health, boolean healthIsPercentage, int healthValue, boolean mount, boolean naked, boolean owned, Player[] owner, Ent passenger, boolean size, int sizeValue, boolean target, Player[] targets, int velocity) {
 		super (null, alias, angry, bounce, color, colorCode, fireTicks, health, healthIsPercentage, healthValue, mount, naked, owned, owner, passenger, size, sizeValue, target, targets, velocity);
 		this.people = people;
@@ -33,14 +53,16 @@ public class Person extends Ent {
 		this.passenger=passenger;
 	}
 	
-	/*
-	 * Spawns many mobs.
-	 * @param player: The player who wants to spawn the mobs
-	 * @param plugin: Um... seems to only be needed for printing errors.
-	 * @param location: A Location describing where the mobs will spawn
-	 * @param count: How many mobs you want
+	/**
+	 * {@inheritDoc}
+	 * In the Person class, note that the player will end up within the last sequence spawned that uses this player
+	 * @param player: The player who wants to spawn the entities
+	 * @param plugin: Needed only for logging
+	 * @param location: Where the entities will be spawned (uses all location values, I believe)
+	 * @param count: How many entities you want
+	 * @return boolean: true if successful, false otherwise.
+	 * @see spawn(player, plugin, location)
 	 */
-
 	public boolean spawn(Player player, Spawn plugin, Location location, int count)
 	{
 		for (int i=0; i<count; i++)
@@ -52,13 +74,16 @@ public class Person extends Ent {
 		return true;
 	}
 
-	/*
-	 * Spawns a single mob, and returns it.  Useful if you want to manipulate the mob after being spawned.
-	 * @param player: The player who wants to spawn the mobs
-	 * @param plugin: Um... seems to only be needed for printing errors.
-	 * @param location: A Location describing where the mobs will spawn
+	/**
+	 * {@inheritDoc}
+	 * In the Person class, this means that the player will be spawned at that location instead of an Entity type.
+	 * @param player: The player who wants to spawn the entities
+	 * @param plugin: Needed only for logging
+	 * @param location: Where the entities will be spawned (uses all location values, I believe)
+	 * @return Entity: The entity that was spawned
+	 * @see spawn(player, plugin, location, count)
+	 * @throws IllegalArgumentException - this usually is thrown when attempting to spawn a superclass not meant to be instantiated; e.g. Animal, LivingEntity, etc.
 	 */
-
 	public Entity spawnSingle(Player p, Spawn plugin, Location loc) throws IllegalArgumentException
 	{
 		Player person = pickPlayer(people);
@@ -93,6 +118,10 @@ public class Person extends Ent {
 		return person;
 	}
 
+	/**
+ * {@inheritDoc}
+ * @return String: description that can be used in output messages
+ */
 	public String description()
 	{
 		return super.description();

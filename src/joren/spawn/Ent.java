@@ -14,6 +14,14 @@ import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
+
+/**
+ * Ent class intended to serve as a container for spawning Ents
+ * 
+ * @author Joren Combs
+ * @version 0.1
+ *
+ */
 public class Ent {
 
 	protected Class<Entity>[] types;
@@ -24,19 +32,29 @@ public class Ent {
 	DyeColor colorCode=DyeColor.WHITE;
 	Player[] owner=null, targets=null;
 	
-	/*
-	 * Describes the kind of mob you want to spawn.
-	 * @param type: the type of mob
-	 * @param passenger: What mob will be riding this one; if none, null
-	 * @param size: Size for slimes; ignored if not a slime
-	 * @param health: Health for mobs
-	 * @param healthPercentage: true if health should be taken as a percentage of normal health
-	 * @param fireTicks: How many ticks the mob will burn (needs to be really, really, high)
-	 * @param velocity: How fast you want the mob to be going when it spawns
-	 * @param angry: is the mob angry or not?
-	 * @param setAngry: Should we manually set the angry parameter, or leave it at the mob type's default?
+	/**
+	 * An Ent describes the kind of entity you want to spawn, and gives you functions to spawn it.
+	 * @param types: The types of entity referred to by the alias
+	 * @param alias: The name given to this collection of entity types
+	 * @param angry: If true, entity will be made angry
+	 * @param bounce: If true, the (projectile) entity will be made to bounce.  So far, no observable effect
+	 * @param color: If true, will set the entity's color to specified colorCode 
+	 * @param colorCode: Used to decide the entity's color if entity supports more than one color
+	 * @param fireTicks: How many ticks the entity will burn (20 ticks/second)
+	 * @param health: If true, will set the entity's health using healthValue
+	 * @param healthPercentage: True if healthValue should be taken as a percentage of normal health
+	 * @param healthValue: Used to set the entity's health if the entity supports it
+	 * @param mount: If true, will make the entity have a mount (e.g. saddle for pig) if it is supported
+	 * @param owned: If true, the entity will belong to Owner
+	 * @param owner: Used to set the entity's owner if entity supports ownership
+	 * @param naked: If true, will strip the entity of clothes/wool
+	 * @param passenger: What entity will be riding this one; if none, null
+	 * @param size: If true, will set the entity's size to sizeValue
+	 * @param sizeValue: If the entity supports it, can be used to set the entity's size
+	 * @param target: If true, entity will have a target.  Does not seem to work for ghasts
+	 * @param targets: A list of potential targets for the entity to choose from
+	 * @param velocity: How fast you want the entity to be going when it spawns
 	 */
-
 	public Ent(Class<Entity>[] types, String alias, boolean angry, boolean bounce, boolean color, DyeColor colorCode, int fireTicks, boolean health, boolean healthIsPercentage, int healthValue, boolean mount, boolean naked, boolean owned, Player[] owner, Ent passenger, boolean size, int sizeValue, boolean target, Player[] targets, int velocity) {
 		this.types = types;
 		this.alias = alias;
@@ -60,7 +78,12 @@ public class Ent {
 		this.velocity=velocity;
 	}
 
-	public Player pickPlayer(Player[] people)
+	/**
+	 * Utility function; randomly chooses a Player from a list.
+	 * @param people: List of potential Players to choose from
+	 * @return Player: Randomly chosen from the list
+	 */
+	protected Player pickPlayer(Player[] people)
 	{
 		if (people != null)
 			if (people.length!=0)
@@ -70,6 +93,12 @@ public class Ent {
 		return null;
 	}
 		
+	/**
+	 * Utility function; randomly chooses an Entity class from a list.  Used to give a random
+	 * quality to the type of entities that may be spawned
+	 * @param people: List of potential Entity classes to choose from
+	 * @return Entity class randomly chosen from the list
+	 */
 	public Class<Entity> pick()
 	{
 		if (types != null)
@@ -80,19 +109,25 @@ public class Ent {
 		return null;
 	}
 		
-	public void setPassenger(Ent passenger)
+	/**
+	 * Utility function; sets this Ent's passenger to another Ent.  Used in the spawn functions
+	 * @param people: List of potential Entity classes to choose from
+	 * @return Entity class randomly chosen from the list
+	 */
+	protected void setPassenger(Ent passenger)
 	{
 		this.passenger=passenger;
 	}
 	
-	/*
+	/**
 	 * Spawns many mobs.
-	 * @param player: The player who wants to spawn the mobs
-	 * @param plugin: Um... seems to only be needed for printing errors.
-	 * @param location: A Location describing where the mobs will spawn
-	 * @param count: How many mobs you want
+	 * @param player: The player who wants to spawn the entities
+	 * @param plugin: Needed only for logging
+	 * @param location: Where the entities will be spawned (uses all location values, I believe)
+	 * @param count: How many entities you want
+	 * @return boolean: true if successful, false otherwise.
+	 * @see spawn(player, plugin, location)
 	 */
-
 	public boolean spawn(Player player, Spawn plugin, Location location, int count)
 	{
 		for (int i=0; i<count; i++)
@@ -104,13 +139,15 @@ public class Ent {
 		return true;
 	}
 
-	/*
-	 * Spawns a single mob, and returns it.  Useful if you want to manipulate the mob after being spawned.
-	 * @param player: The player who wants to spawn the mobs
-	 * @param plugin: Um... seems to only be needed for printing errors.
-	 * @param location: A Location describing where the mobs will spawn
+	/**
+	 * Spawns a single entity, and returns it.  Useful if you want to manipulate the entity after being spawned.
+	 * @param player: The player who wants to spawn the entities
+	 * @param plugin: Needed only for logging
+	 * @param location: Where the entities will be spawned (uses all location values, I believe)
+	 * @return Entity: The entity that was spawned
+	 * @see spawn(player, plugin, location, count)
+	 * @throws IllegalArgumentException - this usually is thrown when attempting to spawn a superclass not meant to be instantiated; e.g. Animal, LivingEntity, etc.
 	 */
-
 	public Entity spawnSingle(Player p, Spawn plugin, Location loc) throws IllegalArgumentException
 	{
 		Class<Entity> type = pick();
@@ -283,10 +320,6 @@ public class Ent {
 				} catch (NoSuchMethodException e){}
 			}
 			
-/*			else if (type==MobType.SADDLEDPIG)
-				((Pig)mob).setSaddle(true);
-				*/
-
 			//VELOCITY
 			
 			if (velocity!=0)
@@ -316,6 +349,11 @@ public class Ent {
 		return null;
 	}
 
+	/**
+	 * Used to get the description of this Ent.  Recursively gets the description of any Ents riding this one
+	 * as well.  Intended to provide somewhat user-friendly output for what just got spawned
+	 * @return String: description that can be used in output messages
+	 */
 	public String description()
 	{
 		if (passenger != null)

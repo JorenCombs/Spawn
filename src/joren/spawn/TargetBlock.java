@@ -6,6 +6,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
+
 /**
  * @author toi
  * Thanks to Raphfrk for optimization of this class.
