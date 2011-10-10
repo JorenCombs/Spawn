@@ -98,7 +98,7 @@ public class Person extends Ent {
 		if (health)//Do not use setExperience, that is only for orbs.
 		{
 			if ((healthIsPercentage))
-			person.setHealth((int)((double)healthValue));
+				person.setHealth((int)(((double)healthValue)/5));
 			else
 				person.setHealth(healthValue);
 		}
