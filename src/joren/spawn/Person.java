@@ -15,6 +15,7 @@ import org.bukkit.util.Vector;
  */
 public class Person extends Ent {
 
+	/** A list of possible Players that can be chosen from according to the alias given */
 	private Player[] people;
 	
 	/**
@@ -117,14 +118,4 @@ public class Person extends Ent {
 		}
 		return person;
 	}
-
-	/**
- * {@inheritDoc}
- * @return String: description that can be used in output messages
- */
-	public String description()
-	{
-		return super.description();
-	}
-
 }

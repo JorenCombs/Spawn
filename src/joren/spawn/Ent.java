@@ -24,12 +24,19 @@ import org.bukkit.util.Vector;
  */
 public class Ent {
 
+	/** The list of possible entity types that can be chosen from */
 	protected Class<Entity>[] types;
+	/** The alias that will be used for deciding what entity types to choose from */
 	String alias;
+	/** This entity's passenger, if any */
 	protected Ent passenger;
+	/** Values used for modifying spawned entities */
 	protected int sizeValue=1, healthValue=100, fireTicks=-1, velocity=0;
+	/** Booleans generally indicating whether specified values should be set (true) or ignored (false) */
 	boolean angry=false, bounce=false, color=false, health=false, healthIsPercentage=true, mount=false, naked=false, owned=false, size=false, target=false;
+	/** Used for setting an entity's color (e.g. sheep)*/
 	DyeColor colorCode=DyeColor.WHITE;
+	/** Used for dealing with owners and possible targets for entities that support them */
 	Player[] owner=null, targets=null;
 	
 	/**

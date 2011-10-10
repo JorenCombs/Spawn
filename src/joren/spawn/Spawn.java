@@ -38,13 +38,21 @@ import com.nijikokun.bukkit.Permissions.Permissions;
  */
 public class Spawn extends JavaPlugin {
 	public java.util.logging.Logger log = java.util.logging.Logger.getLogger("Minecraft");
+	/** Handle to access the Permissions plugin */
 	public static PermissionHandler Permissions;
-	protected static String config = "plugins/Spawn/Spawn.yml";
-	protected static String path = "plugins/Spawn";
-	protected static String header = "[Spawn] ";
+	/** Name of the plugin, used in output messages */
 	protected static String name = "Spawn";
+	/** Path where the plugin's saved information is located */
+	protected static String path = "plugins" + File.separator + name;
+	/** Location of the config YML file */
+	protected static String config = path + File.separator + name + ".yml";
+	/** Header used for console and player output messages */
+	protected static String header = "[Spawn] ";
+	/** Represents the plugin's YML configuration */
 	protected static Configuration cfg;
+	/** True if this plugin is to be used with Permissions, false if not */
 	protected boolean permissions = false;
+	/** Limitations on how many entities can be spawned and what the maximum size of a spawned entity should be */
 	protected int spawnLimit, sizeLimit;
 
 	/**
@@ -63,8 +71,7 @@ public class Spawn extends JavaPlugin {
 	}
 	
 	/**
-	 * Disables the plugin.  Initializes plugin description variables (in case they are different from
-	 * when written) and initiates a reload of the plugin
+	 * Saves plugin configuration to disk so that the plugin can be safely disabled.
 	 */
 	public void onDisable() {
 		save();
