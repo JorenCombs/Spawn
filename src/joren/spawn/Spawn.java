@@ -523,7 +523,7 @@ public class Spawn extends JavaPlugin {
 								}
 							}
 						int bodyCount=0;
-						Class<Entity>[] targetEnts = lookup(mobParam[0], sender, "spawn.kill");
+						Class<Entity>[] targetEnts = lookup(mobParam[0], sender, "spawn.kill-ent");
 						if (targetEnts.length == 0)
 						{
 							sender.sendMessage(ChatColor.RED + "Invalid mob type.");
@@ -540,7 +540,7 @@ public class Spawn extends JavaPlugin {
 						return true;
 					}
 					// Done with /kill
-					else
+					else if (allowedTo(sender, "spawn.spawn"))
 					{
 						if (!(sender instanceof Player))
 						{
@@ -787,10 +787,10 @@ public class Spawn extends JavaPlugin {
 								}
 							}
 							index2=index;
-							Player[] people = lookupPlayers(mobParam[0], sender, "spawn.player");
+							Player[] people = lookupPlayers(mobParam[0], sender, "spawn.spawn-player");
 							if (people.length == 0)
 							{
-								Class<Entity>[] results = lookup(mobParam[0], sender, "spawn.spawn");
+								Class<Entity>[] results = lookup(mobParam[0], sender, "spawn.spawn-ent");
 								if (results.length == 0)
 								{
 									sender.sendMessage(ChatColor.RED + "Invalid mob type: " + mobParam[0]);
@@ -969,13 +969,13 @@ public class Spawn extends JavaPlugin {
 			sender.sendMessage(ChatColor.YELLOW + "Kills all entities with <optional parameters> and gives a body count");
 			if (sender instanceof Player)
 			{
-				sender.sendMessage(ChatColor.BLUE + "/spawn kill <mobtype><params> <radius>");
-				sender.sendMessage(ChatColor.YELLOW + "Kills all mobs of <type> with <optional parameters> within <optional radius> of you and gives a body count");
+				sender.sendMessage(ChatColor.BLUE + "/spawn kill <enttype><params> <radius>");
+				sender.sendMessage(ChatColor.YELLOW + "Kills all entities of <type> with <optional parameters> within <optional radius> of you and gives a body count");
 			}
 			else
 			{
-				sender.sendMessage(ChatColor.BLUE + "/spawn kill <mobtype><params>");
-				sender.sendMessage(ChatColor.YELLOW + "Kills all mobs of <type> with <optional parameters> and gives a body count");
+				sender.sendMessage(ChatColor.BLUE + "/spawn kill <enttype><params>");
+				sender.sendMessage(ChatColor.YELLOW + "Kills all entities of <type> with <optional parameters> and gives a body count");
 			}
 		}
 	}
