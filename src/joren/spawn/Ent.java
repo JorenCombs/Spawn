@@ -103,15 +103,16 @@ public class Ent {
 		this.velValue=velValue;
 		this.velRandom=velRandom;
 		
-		if (types.length==1 && Item.class.isAssignableFrom(pick()))
-		{
-			Material test = Material.getMaterial(itemType);
-			if (test == null)
-				description = "NULL";
-			else
-				description = test.toString();
-			description+="(" + itemType + "," + itemAmount + "," + itemDamage + "," + itemData + ")";
-		}
+		if (types!=null)
+			if (types.length==1 && Item.class.isAssignableFrom(pick()))
+			{
+				Material test = Material.getMaterial(itemType);
+				if (test == null)
+					description = "NULL";
+				else
+					description = test.toString();
+				description+="(" + itemType + "," + itemAmount + "," + itemDamage + "," + itemData + ")";
+			}
 	}
 
 	/**

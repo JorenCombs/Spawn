@@ -170,7 +170,7 @@ public class Spawn extends JavaPlugin {
 		cfg.setProperty("alias.flying", Arrays.asList("Ghast"));
 		cfg.setProperty("alias.mob", Arrays.asList("CaveSpider", "Chicken", "Creeper", "Cow", "Enderman", "Pig", "PigZombie", "Sheep", "Silverfish", "Skeleton", "Slime", "Spider", "Squid", "Wolf", "Zombie"));
 		cfg.setProperty("alias.kill", Arrays.asList("CaveSpider", "Chicken", "Creeper", "Cow", "Enderman", "Ghast", "Giant", "Pig", "PigZombie", "Sheep", "Silverfish", "Skeleton", "Slime", "Spider", "Squid", "Wolf", "Zombie"));
-		cfg.setProperty("alias.meat", Arrays.asList("Pig, Cow, Chicken"));
+		cfg.setProperty("alias.meat", Arrays.asList("Pig", "Cow", "Chicken"));
 		cfg.setProperty("alias.meat-parameters", "/f:60");
 		
 		//Transit
@@ -345,7 +345,6 @@ public class Spawn extends JavaPlugin {
 	{
 		List<Class<Entity>> list = new ArrayList<Class<Entity>>();
 		List<String> names = new ArrayList<String>();
-		info("lookup called with alias " + alias);
 		String params = "";
 		Class<Entity>[] derp = new Class[0];//Needed for ridiculous workaround below
 		if (alias == null)

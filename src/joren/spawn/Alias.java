@@ -15,7 +15,6 @@ public class Alias {
 
 	public Alias(Class<Entity>[] types, String params)
 	{
-		Spawn.info("Constructor called, types = " + types.length + " classes, params = " + params);
 		this.types=types;
 		this.params=params;
 	}
