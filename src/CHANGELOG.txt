@@ -1,3 +1,8 @@
+v0.2
+- Made it possible to spawn Items
+- Redid configuration file, made it use lists
+- Randomized direction entity faces when spawned (not the same as velocity)
+- Allow for the inclusion of default parameters in alias (e.g. supercreeper could be creeper/a)
 
 v0.1
 - Initial release

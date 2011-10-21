@@ -4,6 +4,7 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import org.bukkit.ChatColor;
@@ -21,6 +22,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.util.Vector;
 import org.bukkit.util.config.Configuration;
 import org.bukkit.util.config.ConfigurationNode;
 
@@ -37,7 +39,7 @@ import com.nijikokun.bukkit.Permissions.Permissions;
  * the original code left.  Also uses TargetBlock code from toi and Raphfrk
  */
 public class Spawn extends JavaPlugin {
-	public java.util.logging.Logger log = java.util.logging.Logger.getLogger("Minecraft");
+	public static java.util.logging.Logger log = java.util.logging.Logger.getLogger("Minecraft");
 	/** Handle to access the Permissions plugin */
 	public static PermissionHandler Permissions;
 	/** Name of the plugin, used in output messages */
@@ -49,11 +51,14 @@ public class Spawn extends JavaPlugin {
 	/** Header used for console and player output messages */
 	protected static String header = "[Spawn] ";
 	/** Represents the plugin's YML configuration */
+	protected static List<String> neverSpawn = new ArrayList<String>();
+	protected static List<String> neverKill = new ArrayList<String>();
 	protected static Configuration cfg;
 	/** True if this plugin is to be used with Permissions, false if not */
 	protected boolean permissions = false;
 	/** Limitations on how many entities can be spawned and what the maximum size of a spawned entity should be */
 	protected int spawnLimit, sizeLimit;
+	protected double hSpeedLimit;
 
 	/**
 	 * Initializes plugin description variables (in case they are different from when written)
@@ -93,20 +98,21 @@ public class Spawn extends JavaPlugin {
 		cfg = new Configuration(file);
 		if(!file.exists())
 		{
+			warning("Could not find a configuration file, saving a new one...");
 			if (!saveDefault())
 			{
-				warning("Running on default values anyway...");
-				sizeLimit = 100;
-				spawnLimit = 300;
-				permissions = true;
+				warning("Running on default values, but could not save a new configuration file.");
 			}
 		}
 		else
 		{
 			cfg.load();
-			sizeLimit = cfg.getInt("Spawn.size-limit", 100);
-			spawnLimit = cfg.getInt("Spawn.spawn-limit", 300);
-			permissions = cfg.getBoolean("Spawn.use-permissions", true);
+			sizeLimit = cfg.getInt("spawn.size-limit", 100);
+			spawnLimit = cfg.getInt("spawn.spawn-limit", 300);
+			hSpeedLimit = cfg.getDouble("spawn.horizontal-speed-limit", 10);
+			permissions = cfg.getBoolean("spawn.use-permissions", true);
+			neverSpawn = cfg.getStringList("never.spawn", neverSpawn);
+			neverKill = cfg.getStringList("never.kill", neverKill);
 			if (permissions)
 				setupPermissions();
 		}
@@ -123,9 +129,86 @@ public class Spawn extends JavaPlugin {
 	{
 		info("Resetting configuration file with default values...");
 		cfg = new Configuration(new File(config));
-		cfg.setProperty("Spawn.use-permissions", true);
-		cfg.setProperty("Spawn.spawn-limit", 300);
-		cfg.setProperty("Spawn.size-limit", 100);
+
+		neverSpawn = Arrays.asList("Animals", "Creature", "Entity", "Explosive", "FallingSand", "Fish", "Flying", "HumanEntity", "LivingEntity", "Monster", "Painting", "Player", "Projectile", "Vehicle", "WaterMob");
+		neverKill = Arrays.asList("Animals", "Creature", "Entity", "Explosive", "FallingSand", "Fish", "Flying", "HumanEntity", "LivingEntity", "Monster", "Painting", "Player", "Projectile", "Vehicle", "WaterMob");
+
+		cfg.setProperty("alias.cavespider", Arrays.asList("CaveSpider"));
+		cfg.setProperty("alias.chicken", Arrays.asList("Chicken"));
+		cfg.setProperty("alias.cow", Arrays.asList("Cow"));
+		cfg.setProperty("alias.creeper", Arrays.asList("Creeper"));
+		cfg.setProperty("alias.enderman", Arrays.asList("Enderman"));
+		cfg.setProperty("alias.endermen", Arrays.asList("Enderman"));
+		cfg.setProperty("alias.ghast", Arrays.asList("Ghast"));
+		cfg.setProperty("alias.giant", Arrays.asList("Giant"));
+		cfg.setProperty("alias.pig", Arrays.asList("Pig"));
+		cfg.setProperty("alias.pigzombie", Arrays.asList("PigZombie"));
+		cfg.setProperty("alias.zombiepigman", Arrays.asList("PigZombie"));
+		cfg.setProperty("alias.pigman", Arrays.asList("PigZombie"));
+		cfg.setProperty("alias.sheep", Arrays.asList("Sheep"));
+		cfg.setProperty("alias.silverfish", Arrays.asList("Silverfish"));
+		cfg.setProperty("alias.skeleton", Arrays.asList("Skeleton"));
+		cfg.setProperty("alias.slime", Arrays.asList("Slime"));
+		cfg.setProperty("alias.spider", Arrays.asList("Spider"));
+		cfg.setProperty("alias.squid", Arrays.asList("Squid"));
+		cfg.setProperty("alias.wolf", Arrays.asList("Wolf"));
+		cfg.setProperty("alias.dog", Arrays.asList("Wolf"));
+		cfg.setProperty("alias.zombie", Arrays.asList("Zombie"));
+		
+		cfg.setProperty("alias.friendly", Arrays.asList("Chicken", "Cow", "Pig", "Sheep", "Squid"));
+		cfg.setProperty("alias.hostile", Arrays.asList("CaveSpider", "Creeper", "Enderman", "Ghast", "Giant", "Silverfish", "Skeleton", "Slime", "Spider", "Zombie"));
+		cfg.setProperty("alias.provoke", Arrays.asList("Enderman", "PigZombie", "Wolf"));
+		cfg.setProperty("alias.burnable", Arrays.asList("Enderman", "Skeleton", "Zombie"));
+		cfg.setProperty("alias.day", Arrays.asList("Chicken", "Cow", "Pig", "Sheep", "Squid"));
+		cfg.setProperty("alias.night", Arrays.asList("Creeper", "Enderman", "Skeleton", "Spider", "Zombie"));
+		cfg.setProperty("alias.cave", Arrays.asList("CaveSpider", "Creeper", "Enderman", "Silverfish", "Skeleton", "Slime", "Spider", "Zombie"));
+		cfg.setProperty("alias.boss", Arrays.asList("Ghast", "Giant"));
+		cfg.setProperty("alias.flying", Arrays.asList("Ghast"));
+		cfg.setProperty("alias.mob", Arrays.asList("CaveSpider", "Chicken", "Creeper", "Cow", "Enderman", "Pig", "PigZombie", "Sheep", "Silverfish", "Skeleton", "Slime", "Spider", "Squid", "Wolf", "Zombie"));
+		cfg.setProperty("alias.kill", Arrays.asList("CaveSpider", "Chicken", "Creeper", "Cow", "Enderman", "Ghast", "Giant", "Pig", "PigZombie", "Sheep", "Silverfish", "Skeleton", "Slime", "Spider", "Squid", "Wolf", "Zombie"));
+
+		//Transit
+		cfg.setProperty("alias.boat", Arrays.asList("Boat"));
+		cfg.setProperty("alias.cart", Arrays.asList("Minecart"));
+		cfg.setProperty("alias.minecart", Arrays.asList("Minecart"));
+		cfg.setProperty("alias.poweredminecart", Arrays.asList("PoweredMinecart"));
+		cfg.setProperty("alias.locomotive", Arrays.asList("PoweredMinecart"));
+		cfg.setProperty("alias.storageminecart", Arrays.asList("StorageMinecart"));
+		cfg.setProperty("alias.train", Arrays.asList("Minecart"));
+		cfg.setProperty("alias.transit", Arrays.asList("Boat", "Minecart", "PoweredMinecart", "StorageMinecart"));
+
+		//Projectiles
+		cfg.setProperty("alias.arrow", Arrays.asList("Arrow"));
+		cfg.setProperty("alias.egg", Arrays.asList("Egg"));
+		cfg.setProperty("alias.fireball", Arrays.asList("Fireball"));
+		cfg.setProperty("alias.snowball", Arrays.asList("Snowball"));
+		cfg.setProperty("alias.projectile", Arrays.asList("Arrow", "Egg", "Fireball", "Snowball"));
+
+		//Explosives
+		cfg.setProperty("alias.lightning", Arrays.asList("LightningStrike"));
+		cfg.setProperty("alias.lightningstrike", Arrays.asList("LightningStrike"));
+		cfg.setProperty("alias.strike", Arrays.asList("LightningStrike"));
+		cfg.setProperty("alias.primedtnt", Arrays.asList("PrimedTNT"));
+		cfg.setProperty("alias.tnt", Arrays.asList("TNTPrimed"));
+		cfg.setProperty("alias.weather", Arrays.asList("Weather"));
+		cfg.setProperty("alias.explosive", Arrays.asList("LightningStrike", "PrimedTNT", "Weather"));
+		
+		//Drops
+		cfg.setProperty("alias.experience", Arrays.asList("ExperienceOrb"));
+		cfg.setProperty("alias.experienceorb", Arrays.asList("ExperienceOrb"));
+		cfg.setProperty("alias.orb", Arrays.asList("ExperienceOrb"));
+		cfg.setProperty("alias.xp", Arrays.asList("ExperienceOrb"));
+		cfg.setProperty("alias.xporb", Arrays.asList("ExperienceOrb"));
+
+		//Example Player List
+		cfg.setProperty("player-alias.example", Arrays.asList("JohnDoe", "JohnDoesBrother"));
+		
+
+		permissions = true;
+		spawnLimit = 100;
+		sizeLimit = 50;
+		hSpeedLimit = 10;
+
 		if (save())
 		{
 			reload();
@@ -144,6 +227,12 @@ public class Spawn extends JavaPlugin {
 	{
 		info("Saving configuration file...");
 		File dir = new File(path);
+		cfg.setProperty("spawn.use-permissions", permissions);
+		cfg.setProperty("spawn.spawn-limit", spawnLimit);
+		cfg.setProperty("spawn.size-limit", sizeLimit);
+		cfg.setProperty("spawn.horizontal-speed-limit", hSpeedLimit);
+		cfg.setProperty("never.spawn", neverSpawn);
+		cfg.setProperty("never.kill", neverKill);
 		if(!dir.exists())
 		{
 			if (!dir.mkdir())
@@ -177,8 +266,9 @@ public class Spawn extends JavaPlugin {
 	
 	public void flag(Class<Entity> ent)
 	{
-		if (ent != null)
-			cfg.setProperty("Avoid." + ent.getSimpleName(), true);
+		if (neverSpawn.contains(ent.getSimpleName()))
+			return;
+		neverSpawn.add(ent.getSimpleName());
 	}
 	
 	/**
@@ -192,19 +282,22 @@ public class Spawn extends JavaPlugin {
 	 * @param alias: An alias/name associated with one or more players
 	 * @param sender: The person who asked for the alias
 	 * @param permsPrefix: The intended purpose of this list, used as a permissions prefix
-	 * @return Player[]: A list of players.  If no players were found, returns a size 0 array (not null)
+	 * @return PlayerAlias: A list of players combined with parameters.  If no players were found, returns a size 0 array (not null)
 	 */
 	
-	protected Player[] lookupPlayers(String alias, CommandSender sender, String permsPrefix)
+	protected PlayerAlias lookupPlayers(String alias, CommandSender sender, String permsPrefix)
 	{
-		ArrayList<Player> list = new ArrayList<Player>();
+		List<Player> list = new ArrayList<Player>();
+		List<String> names = new ArrayList<String>();
+		String params = "";
 		Player[] derp = new Player[0];//Needed for workaround below
 		if (alias == null)
-			return list.toArray(derp);
-		ConfigurationNode node = cfg.getNode("PlayerAlias." + alias.toLowerCase());
-		if (node!=null && allowedTo(sender, permsPrefix + "." + alias))
+			return new PlayerAlias(list.toArray(derp), params);
+		names = cfg.getStringList("player-alias." + alias.toLowerCase(), names);
+		params = cfg.getString("alias." + alias.toLowerCase() + "-parameters", params);
+		if ((names.size() > 0) && allowedTo(sender, permsPrefix + "." + alias))
 		{
-			for (Iterator<String> i = node.getKeys().iterator(); i.hasNext();)
+			for (Iterator<String> i = names.iterator(); i.hasNext();)
 			{
 				String name = i.next();
 				Player target = getServer().getPlayerExact(name);
@@ -220,7 +313,7 @@ public class Spawn extends JavaPlugin {
 			if (target != null)
 				list.add(target);
 		}
-		return list.toArray(derp); // what a ridiculous workaround
+		return new PlayerAlias(list.toArray(derp), params); // what a ridiculous workaround
 	}
 
 	/**
@@ -233,24 +326,28 @@ public class Spawn extends JavaPlugin {
 	 * @param alias: An alias/name associated with one or more entity types
 	 * @param sender: The person who asked for the alias
 	 * @param permsPrefix: The intended purpose of this list, used as a permissions prefix
-	 * @return Player[]: A list of players.  If no players were found, returns a size 0 array (not null)
+	 * @return Alias: A list of entities combined with parameters.  If no entities were found, returns a size 0 array (not null)
 	 */
-	public Class<Entity>[] lookup(String alias, CommandSender sender, String permsPrefix)
+	public Alias lookup(String alias, CommandSender sender, String permsPrefix)
 	{
-		ArrayList<Class<Entity>> list = new ArrayList<Class<Entity>>();
-		Class<Entity>[] derp = new Class[0];//Needed for workaround below
+		List<Class<Entity>> list = new ArrayList<Class<Entity>>();
+		List<String> names = new ArrayList<String>();
+		info("lookup called with alias " + alias);
+		String params = "";
+		Class<Entity>[] derp = new Class[0];//Needed for ridiculous workaround below
 		if (alias == null)
-			return list.toArray(derp);
+			return new Alias(list.toArray(derp), params);
 		if (alias.toLowerCase().startsWith("org.bukkit.entity."))//allow user to specify formal name to avoid conflict (e.g. player named Zombie and not able to use lowercase because of lack of alias, which would be generated after using the formal name once)
 		{
 			if (alias.length() > 18)
 				alias = alias.substring(17);
 			else
-				return (Class<Entity>[]) list.toArray(derp);//an empty list since they didn't finish specifying the class
+				return new Alias(list.toArray(derp), params);//an empty list since they didn't finish specifying the class
 		}
-		ConfigurationNode node = cfg.getNode("Alias." + alias.toLowerCase());
-		if (node!=null)	
-			for (Iterator<String> i = node.getKeys().iterator(); i.hasNext();)
+		names = cfg.getStringList("alias." + alias.toLowerCase(), names);
+		params = cfg.getString("alias." + alias.toLowerCase() + "-parameters", params);
+		if (names.size() > 0)
+			for (Iterator<String> i = names.iterator(); i.hasNext();)
 			{
 				String entName = "org.bukkit.entity." + i.next();
 				try
@@ -258,7 +355,7 @@ public class Spawn extends JavaPlugin {
 					Class<?> c = (Class<?>) Class.forName(entName);
 					if (Entity.class.isAssignableFrom(c))
 					{
-						if (allowedTo(sender, permsPrefix + "." + c.getSimpleName()) && !cfg.getBoolean("Avoid." + c.getSimpleName(), false))
+						if (allowedTo(sender, permsPrefix + "." + c.getSimpleName()) && !neverSpawn.contains(c.getSimpleName()))
 						{
 							list.add((Class<Entity>) c);
 						}
@@ -276,10 +373,10 @@ public class Spawn extends JavaPlugin {
 				Class<?> c = (Class<?>) Class.forName("org.bukkit.entity." + alias);
 				if (Entity.class.isAssignableFrom(c))
 				{
-					if (allowedTo(sender, permsPrefix + "." + c.getSimpleName()) && !cfg.getBoolean("Avoid." + c.getSimpleName(), false))
+					if (allowedTo(sender, permsPrefix + "." + c.getSimpleName()) && !neverSpawn.contains(c.getSimpleName()))
 					{
 						list.add((Class<Entity>) c);
-						cfg.setProperty("Alias." + alias.toLowerCase() + "." + c.getSimpleName(), true);
+						cfg.setProperty("alias." + alias.toLowerCase(), Arrays.asList(c.getSimpleName()));
 						info("Class " + c.getName() + " has not been invoked before; adding alias to configuration");
 					}
 				}
@@ -289,7 +386,7 @@ public class Spawn extends JavaPlugin {
 				;//om nom nom
 			}
 		}
-		return (Class<Entity>[]) list.toArray(derp); // what a ridiculous workaround
+		return new Alias(list.toArray(derp), params); // what a ridiculous workaround to make it return an array
 	}
 	
 	/**
@@ -333,6 +430,7 @@ public class Spawn extends JavaPlugin {
 							}
 						}
 						else if (args.length > 1) //Should be either /sm kill <type> or /sm kill <radius>
+						{
 							try
 							{
 								radius = Integer.parseInt(args[1]);
@@ -341,174 +439,156 @@ public class Spawn extends JavaPlugin {
 							{
 								type=args[1];
 							}
-							
-							String mobParam[] = type.split("/"); //Check type for params
-							int healthValue=100, sizeValue=1, velocity=0;
-							boolean angry = false, bounce = false, color = false, fire = false, health = false, healthIsPercentage = true, mount = false, size = false, target = false, owned = false, naked = false;
-							Player owner[]=null, targets[]=null;
-							DyeColor colorCode=DyeColor.WHITE;
-							if (mobParam.length>1)
+						}
+						String name = type, params = "";
+						if (type.contains("/")) // if the user specified parameters, distinguish them from the name of the entity
+						{
+							name = type.substring(0, type.indexOf("/"));
+							params = type.substring(type.indexOf("/"));
+						}
+						
+						Alias alias = lookup(name, sender, "spawn.kill-ent");
+						String mobParam[] = (name + alias.getParams() + params).split("/"); //user-specified params go last, so they can override alias-specified params
+						Class<Entity>[] targetEnts = alias.getTypes();
+						if (targetEnts.length == 0)
+						{
+							sender.sendMessage(ChatColor.RED + "Invalid mob type.");
+							return false;
+						}
+						int healthValue=100, sizeValue=1;
+						boolean angry = false, color = false, fire = false, health = false, mount = false, size = false, target = false, owned = false, naked = false;
+						PlayerAlias owner=new PlayerAlias(), targets=new PlayerAlias();
+						DyeColor colorCode=DyeColor.WHITE;
+						if (mobParam.length>1)
+						{
+							for (int j=1; j<mobParam.length; j++)
 							{
-								for (int j=1; j<mobParam.length; j++)
+								String paramName = mobParam[j].substring(0, 1);
+								String param = null;
+								if (mobParam[j].length() > 2)
+									param = mobParam[j].substring(2);
+								if (paramName.equalsIgnoreCase("a"))
 								{
-									String paramName = mobParam[j].substring(0, 1);
-									String param = null;
-									if (mobParam[j].length() > 2)
-										param = mobParam[j].substring(2);
-									if (paramName.equalsIgnoreCase("a"))
+									if(allowedTo(sender, "spawn.kill.angry"))
 									{
-										if(allowedTo(sender, "spawn.kill.angry"))
-										{
-											angry=true;
-										}
-										else
-										{
-											sender.sendMessage(ChatColor.RED + "Invalid parameter " + paramName);
-											return false;
-										}
+										angry=true;
 									}
-									else if (paramName.equalsIgnoreCase("c"))
+									else
 									{
-										if(allowedTo(sender, "spawn.kill.color"))
-										{
-											color=true;
-											try
-											{
-												colorCode = DyeColor.getByData(Byte.parseByte(param));
-											}
-											catch (NumberFormatException e)
-											{
-												try
-												{
-													colorCode = DyeColor.valueOf(DyeColor.class, param.toUpperCase());
-												} catch (IllegalArgumentException f)
-												{
-													sender.sendMessage(ChatColor.RED + "Color parameter must be a valid color or a number from 0 to 15.");
-													return false;
-												}
-											}
-										}
-										else
-										{
-											sender.sendMessage(ChatColor.RED + "Invalid parameter " + paramName);
-											return false;
-										}
+										sender.sendMessage(ChatColor.RED + "Invalid parameter " + paramName);
+										return false;
 									}
-									else if (paramName.equalsIgnoreCase("f"))
+								}
+								else if (paramName.equalsIgnoreCase("c"))
+								{
+									if(allowedTo(sender, "spawn.kill.color"))
 									{
-										if(allowedTo(sender, "spawn.kill.fire"))
-											fire=true;
-										else
+										color=true;
+										try
 										{
-											sender.sendMessage(ChatColor.RED + "Invalid parameter " + paramName);
-											return false;
+											colorCode = DyeColor.getByData(Byte.parseByte(param));
 										}
-									}
-									else if (paramName.equalsIgnoreCase("h"))
-									{
-										if (allowedTo(sender, "spawn.kill.health"))
+										catch (NumberFormatException e)
 										{
 											try
 											{
-												if (param.endsWith("%"))
-												{
-													sender.sendMessage(ChatColor.RED + "Health parameter must be an integer (Percentage not supported for kill)");
-													return false;
-												}
-												else
-												{
-													healthIsPercentage=false;
-													healthValue = Integer.parseInt(param);
-													health=true;
-												}
-											} catch (NumberFormatException e)
+												colorCode = DyeColor.valueOf(DyeColor.class, param.toUpperCase());
+											} catch (IllegalArgumentException f)
+											{
+												sender.sendMessage(ChatColor.RED + "Color parameter must be a valid color or a number from 0 to 15.");
+												return false;
+											}
+										}
+									}
+									else
+									{
+										sender.sendMessage(ChatColor.RED + "Invalid parameter " + paramName);
+										return false;
+									}
+								}
+								else if (paramName.equalsIgnoreCase("f"))
+								{
+									if(allowedTo(sender, "spawn.kill.fire"))
+										fire=true;
+									else
+									{
+										sender.sendMessage(ChatColor.RED + "Invalid parameter " + paramName);
+										return false;
+									}
+								}
+								else if (paramName.equalsIgnoreCase("h"))
+								{
+									if (allowedTo(sender, "spawn.kill.health"))
+									{
+										try
+										{
+											if (param.endsWith("%"))
 											{
 												sender.sendMessage(ChatColor.RED + "Health parameter must be an integer (Percentage not supported for kill)");
 												return false;
 											}
-										}
-										else
-										{
-											sender.sendMessage(ChatColor.RED + "Invalid parameter " + paramName);
-											return false;
-										}
-									}
-									else if (paramName.equalsIgnoreCase("m"))
-									{
-										if(allowedTo(sender, "spawn.kill.mount"))
-										{
-											mount=true;
-										}
-										else
-										{
-											sender.sendMessage(ChatColor.RED + "Invalid parameter " + paramName);
-											return false;
-										}
-									}
-									else if (paramName.equalsIgnoreCase("n"))
-									{
-										if(allowedTo(sender, "spawn.kill.naked"))
-											naked=true;
-										else
-										{
-											sender.sendMessage(ChatColor.RED + "Invalid parameter " + paramName);
-											return false;
-										}
-									}
-									else if (paramName.equalsIgnoreCase("o"))
-									{
-										if(allowedTo(sender, "spawn.kill.owner"))
-										{
-											owned = true;
-											owner = lookupPlayers(param, sender, "kill.owner"); // No need to validate; null means that it will kill ALL owned wolves.\
-											if ((owner.length == 0)&&(param != null)) // If user typed something, it means they wanted a specific player and would probably be unhappy with killing ALL owners.
-												sender.sendMessage(ChatColor.RED + "Could not locate player by that name.");
-										}
-										else
-										{
-											sender.sendMessage(ChatColor.RED + "Invalid parameter " + paramName);
-											return false;
-										}
-									}
-									else if (paramName.equalsIgnoreCase("s"))
-									{
-										if(allowedTo(sender, "spawn.kill.size"))
-										{
-											try
+											else
 											{
-												size = true;
-												sizeValue = Integer.parseInt(param); //Size limit only for spawning, not killing.
-											} catch (NumberFormatException e)
-											{
-												sender.sendMessage(ChatColor.RED + "Size parameter must be an integer.");
-												return false;
+												healthValue = Integer.parseInt(param);
+												health=true;
 											}
-										}
-										else
+										} catch (NumberFormatException e)
 										{
-											sender.sendMessage(ChatColor.RED + "Invalid parameter " + paramName);
+											sender.sendMessage(ChatColor.RED + "Health parameter must be an integer (Percentage not supported for kill)");
 											return false;
 										}
 									}
-									else if (paramName.equalsIgnoreCase("t"))
+									else
+									{
+										sender.sendMessage(ChatColor.RED + "Invalid parameter " + paramName);
+										return false;
+									}
+								}
+								else if (paramName.equalsIgnoreCase("m"))
+								{
+									if(allowedTo(sender, "spawn.kill.mount"))
+									{
+										mount=true;
+									}
+									else
+									{
+										sender.sendMessage(ChatColor.RED + "Invalid parameter " + paramName);
+										return false;
+									}
+								}
+								else if (paramName.equalsIgnoreCase("n"))
+								{
+									if(allowedTo(sender, "spawn.kill.naked"))
+										naked=true;
+									else
+									{
+										sender.sendMessage(ChatColor.RED + "Invalid parameter " + paramName);
+										return false;
+									}
+								}
+								else if (paramName.equalsIgnoreCase("o"))
+								{
+									if(allowedTo(sender, "spawn.kill.owner"))
+									{
+										owned = true;
+										owner = lookupPlayers(param, sender, "kill.owner"); // No need to validate; null means that it will kill ALL owned wolves.\
+										if ((owner.getPeople().length == 0)&&(param != null)) // If user typed something, it means they wanted a specific player and would probably be unhappy with killing ALL owners.
+											sender.sendMessage(ChatColor.RED + "Could not locate player by that name.");
+									}
+									else
+									{
+										sender.sendMessage(ChatColor.RED + "Invalid parameter " + paramName);
+										return false;
+									}
+								}
+								else if (paramName.equalsIgnoreCase("s"))
+								{
+									if(allowedTo(sender, "spawn.kill.size"))
 									{
 										try
 										{
-											if(allowedTo(sender, "spawn.kill.target"))
-											{
-												target=true;
-												targets = lookupPlayers(param, sender, "kill.target");
-												if ((targets.length == 0) && (param != null)) // If user actually bothered to typed something, it means they were trying for a specific player and probably didn't intend for mobs with ANY targets.
-												{
-													sender.sendMessage(ChatColor.RED + "Could not find a target by that name");
-													return false;
-												}
-											}
-											else
-											{
-												sender.sendMessage(ChatColor.RED + "Invalid parameter " + paramName);
-												return false;
-											}
+											size = true;
+											sizeValue = Integer.parseInt(param); //Size limit only for spawning, not killing.
 										} catch (NumberFormatException e)
 										{
 											sender.sendMessage(ChatColor.RED + "Size parameter must be an integer.");
@@ -521,21 +601,46 @@ public class Spawn extends JavaPlugin {
 										return false;
 									}
 								}
+								else if (paramName.equalsIgnoreCase("t"))
+								{
+									try
+									{
+										if(allowedTo(sender, "spawn.kill.target"))
+										{
+											target=true;
+											targets = lookupPlayers(param, sender, "kill.target");
+											if ((targets.getPeople().length == 0) && (param != null)) // If user actually bothered to typed something, it means they were trying for a specific player and probably didn't intend for mobs with ANY targets.
+											{
+												sender.sendMessage(ChatColor.RED + "Could not find a target by that name");
+												return false;
+											}
+										}
+										else
+										{
+											sender.sendMessage(ChatColor.RED + "Invalid parameter " + paramName);
+											return false;
+										}
+									} catch (NumberFormatException e)
+									{
+										sender.sendMessage(ChatColor.RED + "Size parameter must be an integer.");
+										return false;
+									}
+								}
+								else
+								{
+									sender.sendMessage(ChatColor.RED + "Invalid parameter " + paramName);
+									return false;
+								}
 							}
-						int bodyCount=0;
-						Class<Entity>[] targetEnts = lookup(mobParam[0], sender, "spawn.kill-ent");
-						if (targetEnts.length == 0)
-						{
-							sender.sendMessage(ChatColor.RED + "Invalid mob type.");
-							return false;
 						}
+						int bodyCount=0;
 						if ((radius != 0)&&(!(sender instanceof Player)))
 						{
 							sender.sendMessage(ChatColor.RED + "...and where did you think I'd measure that radius from, Mr Console?");
 							return false;
 						}
 							
-						bodyCount=Kill(sender, targetEnts, radius, angry, color, colorCode, fire, health, healthValue, mount, naked, owned, owner, size, sizeValue, target, targets);
+						bodyCount=Kill(sender, targetEnts, radius, angry, color, colorCode, fire, health, healthValue, mount, naked, owned, owner.getPeople(), size, sizeValue, target, targets.getPeople());
 						sender.sendMessage(ChatColor.BLUE + "Killed " + bodyCount + " " + mobParam[0] + "s.");
 						return true;
 					}
@@ -564,11 +669,37 @@ public class Spawn extends JavaPlugin {
 						{
 							if (index != null)
 								index.setPassenger(index2);
-							String mobParam[] = passengerList[i].split("/"); //Now, look at each passenger to see if there's a parameter
-							int healthValue=100, size=1, fireTicks=-1, velocity=0;
-							boolean setSize = false, health = false, healthIsPercentage = true, angry = false, bounce = false, color = false, mount = false, target = false, tame = false, naked = false;
-							Player targets[]=null;
-							Player owner[]=null;
+							
+							String name = passengerList[i], params = "";
+							if (passengerList[i].contains("/")) // if the user specified parameters, distinguish them from the name of the entity
+							{
+								name = passengerList[i].substring(0, passengerList[i].indexOf("/"));
+								params = passengerList[i].substring(passengerList[i].indexOf("/"));
+							}
+
+							PlayerAlias playerAlias = lookupPlayers(name, sender, "spawn.spawn-player");
+							Alias alias = lookup(name, sender, "spawn.spawn-ent");
+							if (playerAlias.getPeople().length > 0)
+								params = playerAlias.getParams() + params;
+							else
+								params = alias.getParams() + params;
+							String mobParam[] = (name + params).split("/"); //Check type for params
+							Player[] people = playerAlias.getPeople();
+							Class<Entity>[] results = alias.getTypes();
+							if (results.length == 0 && people.length == 0)
+							{
+								sender.sendMessage(ChatColor.RED + "Invalid mob type.");
+								return false;
+							}
+
+							int healthValue=100, itemType=17, itemAmount=1, size=1, fireTicks=-1;
+							short itemDamage=0;
+							Byte itemData=null;
+							double velRandom=0;
+							Vector velValue = new Vector(0,0,0);
+							boolean setSize = false, health = false, healthIsPercentage = true, angry = false, bounce = false, color = false, mount = false, target = false, tame = false, naked = false, velocity = false;
+							PlayerAlias targets=new PlayerAlias();
+							PlayerAlias owner=new PlayerAlias();
 							DyeColor colorCode=DyeColor.WHITE;
 							if (mobParam.length>1)
 							{
@@ -676,6 +807,26 @@ public class Spawn extends JavaPlugin {
 											return false;
 										}
 									}
+									else if (paramName.equalsIgnoreCase("i"))
+									{
+										if(allowedTo(sender, "spawn.item"))
+										{
+											String specify[] = param.split(",");
+											if (specify.length>3)
+												itemData = Byte.parseByte(specify[3]);
+											if (specify.length>2)
+												itemDamage = Short.parseShort(specify[2]);
+											if (specify.length>1)
+												itemAmount = Integer.parseInt(specify[1]);
+											if (specify.length>0)
+												itemType = Integer.parseInt(specify[0]);
+										}
+										else
+										{
+											sender.sendMessage(ChatColor.RED + "Invalid parameter " + paramName);
+											return false;
+										}
+									}
 									else if (paramName.equalsIgnoreCase("m"))
 									{
 										if(allowedTo(sender, "spawn.mount"))
@@ -704,7 +855,7 @@ public class Spawn extends JavaPlugin {
 										{
 											tame=true;
 											owner = lookupPlayers(param, sender, "spawn.owner"); // No need to validate; null means that it will be tame but unownable.  Could be fun.
-											if ((owner.length == 0)&&(param != null)) // If user typed something, it means they wanted a specific player and would probably be unhappy with killing ALL owners.
+											if ((owner.getPeople().length == 0)&&(param != null)) // If user typed something, it means they wanted a specific player and would probably be unhappy with killing ALL owners.
 												sender.sendMessage(ChatColor.RED + "Could not locate player by that name.");
 										}
 										else
@@ -743,7 +894,7 @@ public class Spawn extends JavaPlugin {
 											{
 												target=true;
 												targets = lookupPlayers(param, sender, "spawn.target");
-												if (targets.length == 0)
+												if (targets.getPeople().length == 0)
 												{
 													sender.sendMessage(ChatColor.RED + "Could not find a target by that name");
 													return false;
@@ -764,9 +915,18 @@ public class Spawn extends JavaPlugin {
 									{
 										if(allowedTo(sender, "spawn.velocity"))
 										{
+											velocity = true;
+											String specify[] = param.split(",");
+											if (specify.length==3)
+											{
+												velValue.setX(Double.parseDouble(specify[0]));
+												velValue.setY(Double.parseDouble(specify[1]));
+												velValue.setZ(Double.parseDouble(specify[2]));
+											}	
+											else
 											try
 											{
-												velocity = Integer.parseInt(param);
+												velRandom = Double.parseDouble(param);
 											} catch (NumberFormatException e)
 											{
 												sender.sendMessage(ChatColor.RED + "Velocity parameter must be an integer.");
@@ -787,19 +947,10 @@ public class Spawn extends JavaPlugin {
 								}
 							}
 							index2=index;
-							Player[] people = lookupPlayers(mobParam[0], sender, "spawn.spawn-player");
 							if (people.length == 0)
-							{
-								Class<Entity>[] results = lookup(mobParam[0], sender, "spawn.spawn-ent");
-								if (results.length == 0)
-								{
-									sender.sendMessage(ChatColor.RED + "Invalid mob type: " + mobParam[0]);
-									return false;
-								}
-								index = new Ent(results, mobParam[0], angry, bounce, color, colorCode, fireTicks, health, healthIsPercentage, healthValue, mount, naked, tame, owner, index2, setSize, size, target, targets, velocity);
-							}
+								index = new Ent(results, mobParam[0], angry, bounce, color, colorCode, fireTicks, health, healthIsPercentage, healthValue, itemType, itemAmount, itemDamage, itemData, mount, naked, tame, owner.getPeople(), index2, setSize, size, target, targets.getPeople(), velocity, velRandom, velValue);
 							else
-								index = new Person(people, mobParam[0], angry, bounce, color, colorCode, fireTicks, health, healthIsPercentage, healthValue, mount, naked, tame, owner, index2, setSize, size, target, targets, velocity);
+								index = new Person(people, mobParam[0], angry, bounce, color, colorCode, fireTicks, health, healthIsPercentage, healthValue, itemType, itemAmount, itemDamage, itemData, mount, naked, tame, owner.getPeople(), index2, setSize, size, target, targets.getPeople(), velocity, velRandom, velValue);
 						}
 						
 						if (args.length > 1)
@@ -821,7 +972,7 @@ public class Spawn extends JavaPlugin {
 						}
 						if (count > spawnLimit)
 						{
-							info("Player " + sender.getName() + " tried to spawn more than " + spawnLimit + " mobs");
+							info("Player " + sender.getName() + " tried to spawn more than " + spawnLimit + " entities.");
 							count = spawnLimit;
 						}
 						if (index.spawn(player, this, loc, count))
@@ -925,6 +1076,11 @@ public class Spawn extends JavaPlugin {
 				sender.sendMessage(ChatColor.BLUE + "/spawn <entity>/h:<health>" + ChatColor.YELLOW + " OR " + ChatColor.BLUE + "/spawn <mob>/h:<health%>");
 				sender.sendMessage(ChatColor.YELLOW + "Spawns <entity> with specified health (usually only works for 1-10, can also use percentage)");
 			}
+			if (allowedTo(sender, "spawn.item"))
+			{
+				sender.sendMessage(ChatColor.BLUE + "/spawn Item/i:<type>,<amount/stack>,<damage>,<data>");
+				sender.sendMessage(ChatColor.YELLOW + "Spawns an item stack of specified type number, amount per stack, damage value, and data value.");
+			}
 			if (allowedTo(sender, "spawn.mount"))
 			{
 				sender.sendMessage(ChatColor.BLUE + "/spawn <entity>/m:");
@@ -959,6 +1115,10 @@ public class Spawn extends JavaPlugin {
 			{
 				sender.sendMessage(ChatColor.BLUE + "/spawn <entity>/v:<velocity>");
 				sender.sendMessage(ChatColor.YELLOW + "Spawns <entity> with specified velocity (random direction)");
+				sender.sendMessage(ChatColor.BLUE + "/spawn <entity>/v:<x>,<y>,<z>");
+				sender.sendMessage(ChatColor.YELLOW + "Spawns <entity> with specified velocity and direction");
+				sender.sendMessage(ChatColor.BLUE + "/spawn <entity>/v:<x>,<y>,<z>/v:<offsetvelocity>");
+				sender.sendMessage(ChatColor.YELLOW + "Spawns <entity> with specified direction plus an offset in a random direction");
 			}
 		}
 		if (allowedTo(sender, "spawn.kill"))
@@ -1075,6 +1235,10 @@ public class Spawn extends JavaPlugin {
 		{
 			if (hasClass(types, type))
 			{
+				for (int i=0; i<type.getInterfaces().length; i++)
+					if (neverKill.contains(type.getInterfaces()[i].getSimpleName()))
+						return false; // Never, ever, kill somethingn on this list
+				
 				Method ownerMethod;
 				//CULLING STAGE - each test returns false if it fails to meet it.
 				
@@ -1131,15 +1295,13 @@ public class Spawn extends JavaPlugin {
 								return false;
 					} catch (NoSuchMethodException e){return false;}
 				}
-
+				
 				//MOUNT (default is to leave mounted ents alone)
-
+				
 				Method mountMethod;
 				try
 				{
 					mountMethod = type.getMethod("hasSaddle");
-					info (((Boolean)mount).toString());
-					info (mountMethod.invoke(ent).toString());
 					if (mount != (Boolean)mountMethod.invoke(ent))
 						return false;
 				} catch (NoSuchMethodException e){if (mount) return false;}
@@ -1276,7 +1438,7 @@ public class Spawn extends JavaPlugin {
 	 * Logs an informative message to the console, prefaced with this plugin's header
 	 * @param message: String
 	 */
-	protected void info(String message)
+	protected static void info(String message)
 	{
 		log.info(header + message);
 	}
@@ -1286,7 +1448,7 @@ public class Spawn extends JavaPlugin {
 	 * Used to log severe problems that have prevented normal execution of the plugin
 	 * @param message: String
 	 */
-	protected void severe(String message)
+	protected static void severe(String message)
 	{
 		log.severe(header + message);
 	}
@@ -1296,7 +1458,7 @@ public class Spawn extends JavaPlugin {
 	 * Used to log problems that could interfere with the plugin's ability to meet admin expectations
 	 * @param message: String
 	 */
-	protected void warning(String message)
+	protected static void warning(String message)
 	{
 		log.warning(message);
 	}
@@ -1306,7 +1468,7 @@ public class Spawn extends JavaPlugin {
 	 * @param level: Logging level under which to send the message
 	 * @param message: String
 	 */
-	protected void log(java.util.logging.Level level, String message)
+	protected static void log(java.util.logging.Level level, String message)
 	{
 		log.log(level, header + message);
 	}

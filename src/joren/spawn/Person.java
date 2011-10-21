@@ -42,10 +42,11 @@ public class Person extends Ent {
 	 * @param sizeValue: If the entity supports it, can be used to set the entity's size
 	 * @param target: If true, entity will have a target.  Does not seem to work for ghasts
 	 * @param targets: A list of potential targets for the entity to choose from
-	 * @param velocity: How fast you want the entity to be going when it spawns
+	 * @param velocity: How (specifically) fast you want the entity to be going when it spawns
+	 * @param velRandom: How (randomly) fast you want the entity to be going when it spawns
 	 */
-	public Person(Player[] people, String alias, boolean angry, boolean bounce, boolean color, DyeColor colorCode, int fireTicks, boolean health, boolean healthIsPercentage, int healthValue, boolean mount, boolean naked, boolean owned, Player[] owner, Ent passenger, boolean size, int sizeValue, boolean target, Player[] targets, int velocity) {
-		super (null, alias, angry, bounce, color, colorCode, fireTicks, health, healthIsPercentage, healthValue, mount, naked, owned, owner, passenger, size, sizeValue, target, targets, velocity);
+	public Person(Player[] people, String alias, boolean angry, boolean bounce, boolean color, DyeColor colorCode, int fireTicks, boolean health, boolean healthIsPercentage, int healthValue, int itemType, int itemAmount, short itemDamage, Byte itemData, boolean mount, boolean naked, boolean owned, Player[] owner, Ent passenger, boolean size, int sizeValue, boolean target, Player[] targets, boolean velocity, double velRandom, Vector velValue) {
+		super (null, alias, angry, bounce, color, colorCode, fireTicks, health, healthIsPercentage, healthValue, itemType, itemAmount, itemDamage, itemData, mount, naked, owned, owner, passenger, size, sizeValue, target, targets, velocity, velRandom, velValue);
 		this.people = people;
 	}
 
@@ -69,7 +70,7 @@ public class Person extends Ent {
 		for (int i=0; i<count; i++)
 			if (spawnSingle(player, plugin, location)==null)
 			{
-				plugin.warning("Exception has been thrown; halting entity spawning");
+				Spawn.warning("Exception has been thrown; halting entity spawning");
 				return false;
 			}
 		return true;
@@ -88,6 +89,10 @@ public class Person extends Ent {
 	public Entity spawnSingle(Player p, Spawn plugin, Location loc) throws IllegalArgumentException
 	{
 		Player person = pickPlayer(people);
+
+		loc.setPitch((float)(Math.random() * (double)180));
+		loc.setYaw((float)(Math.random() * (double)360));
+
 		person.leaveVehicle();
 		person.teleport(loc);
 		if (passenger!=null)
@@ -104,12 +109,23 @@ public class Person extends Ent {
 		}
 		if (fireTicks!=-1)
 			person.setFireTicks(fireTicks);
-		if (velocity!=0)
+		if (velRandom!=0)
 		{
-			Vector vel = Vector.getRandom();
-			vel.setX((vel.getX()*2-1)*velocity);
-			vel.setY(vel.getY()*velocity);
-			vel.setZ((vel.getZ()*2-1)*velocity);
+			Vector vel = person.getLocation().getDirection();
+
+			vel.setX(vel.getX()*velRandom + velValue.getX());
+			vel.setY(Math.abs(vel.getY())*velRandom + velValue.getY()); // Mobs usually get spawned on top of blocks; negative Y means dead stop.
+			vel.setZ(vel.getZ()*velRandom + velValue.getZ());
+			
+			double hMagnitude = Math.sqrt(Math.pow(vel.getX(), 2) + Math.pow(vel.getZ(), 2));
+			if (hMagnitude > plugin.hSpeedLimit)
+			{
+				double coeff = plugin.hSpeedLimit / hMagnitude;
+				vel.setX(vel.getX() * coeff);
+				vel.setY(vel.getY() * coeff);
+				vel.setZ(vel.getZ() * coeff);
+			}
+				
 			person.setVelocity(vel);
 		}
 		if (naked)

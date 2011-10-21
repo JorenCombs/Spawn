@@ -5,13 +5,16 @@ import java.lang.reflect.Method;
 
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ExperienceOrb;
+import org.bukkit.entity.Item;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Minecart;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.Vector;
 
 
@@ -27,17 +30,24 @@ public class Ent {
 	/** The list of possible entity types that can be chosen from */
 	protected Class<Entity>[] types;
 	/** The alias that will be used for deciding what entity types to choose from */
-	String alias;
+	protected String alias, description;
 	/** This entity's passenger, if any */
 	protected Ent passenger;
 	/** Values used for modifying spawned entities */
-	protected int sizeValue=1, healthValue=100, fireTicks=-1, velocity=0;
+	protected int sizeValue=1, healthValue=100, fireTicks=-1, itemType=17, itemAmount=1;
+	/** Values used for modifying spawned entities */
+	protected double velRandom=0;
+	/** Values used for modifying spawned entities */
+	protected Vector velValue;
+	/** More information used for Items*/
+	protected short itemDamage=0;
+	protected Byte itemData=null;
 	/** Booleans generally indicating whether specified values should be set (true) or ignored (false) */
-	boolean angry=false, bounce=false, color=false, health=false, healthIsPercentage=true, mount=false, naked=false, owned=false, size=false, target=false;
+	protected boolean angry=false, bounce=false, color=false, health=false, healthIsPercentage=true, mount=false, naked=false, owned=false, size=false, target=false, velocity=false;
 	/** Used for setting an entity's color (e.g. sheep)*/
-	DyeColor colorCode=DyeColor.WHITE;
+	protected DyeColor colorCode=DyeColor.WHITE;
 	/** Used for dealing with owners and possible targets for entities that support them */
-	Player[] owner=null, targets=null;
+	protected Player[] owner=null, targets=null;
 	
 	/**
 	 * An Ent describes the kind of entity you want to spawn, and gives you functions to spawn it.
@@ -60,19 +70,26 @@ public class Ent {
 	 * @param sizeValue: If the entity supports it, can be used to set the entity's size
 	 * @param target: If true, entity will have a target.  Does not seem to work for ghasts
 	 * @param targets: A list of potential targets for the entity to choose from
-	 * @param velocity: How fast you want the entity to be going when it spawns
+	 * @param velocity: if true, will set the entity's velocity using velValue and/or velRandom
+	 * @param velValue: How (specifically) fast you want the entity to be going when it spawns
+	 * @param velRandom: How (randomly) fast you want the entity to be going when it spawns
 	 */
-	public Ent(Class<Entity>[] types, String alias, boolean angry, boolean bounce, boolean color, DyeColor colorCode, int fireTicks, boolean health, boolean healthIsPercentage, int healthValue, boolean mount, boolean naked, boolean owned, Player[] owner, Ent passenger, boolean size, int sizeValue, boolean target, Player[] targets, int velocity) {
-		this.types = types;
-		this.alias = alias;
+	public Ent(Class<Entity>[] types, String alias, boolean angry, boolean bounce, boolean color, DyeColor colorCode, int fireTicks, boolean health, boolean healthIsPercentage, int healthValue, int itemType, int itemAmount, short itemDamage, Byte itemData, boolean mount, boolean naked, boolean owned, Player[] owner, Ent passenger, boolean size, int sizeValue, boolean target, Player[] targets, boolean velocity, double velRandom, Vector velValue) {
+		this.types=types;
+		this.alias=alias;
 		this.angry=angry;
 		this.bounce=bounce;
 		this.color=color;
 		this.colorCode=colorCode;
+		this.description=alias;
 		this.fireTicks=fireTicks;
 		this.health=health;
 		this.healthValue=healthValue;
 		this.healthIsPercentage = healthIsPercentage;
+		this.itemType = itemType;
+		this.itemAmount = itemAmount;
+		this.itemDamage = itemDamage;
+		this.itemData = itemData;
 		this.mount=mount;
 		this.naked=naked;
 		this.owned=owned;
@@ -83,6 +100,18 @@ public class Ent {
 		this.target=target;
 		this.targets=targets;
 		this.velocity=velocity;
+		this.velValue=velValue;
+		this.velRandom=velRandom;
+		
+		if (types.length==1 && Item.class.isAssignableFrom(pick()))
+		{
+			Material test = Material.getMaterial(itemType);
+			if (test == null)
+				description = "NULL";
+			else
+				description = test.toString();
+			description+="(" + itemType + "," + itemAmount + "," + itemDamage + "," + itemData + ")";
+		}
 	}
 
 	/**
@@ -140,7 +169,7 @@ public class Ent {
 		for (int i=0; i<count; i++)
 			if (spawnSingle(player, plugin, location)==null)
 			{
-				plugin.warning("Exception has been thrown; halting entity spawning");
+				Spawn.warning("Spawning has been halted to protect the server from the above error(s)");
 				return false;
 			}
 		return true;
@@ -161,16 +190,33 @@ public class Ent {
 		try 
 		{
 			Entity ent;
+
+			loc.setPitch(-((float)(Math.random() * (double)180)));
+			loc.setYaw((float)(Math.random() * (double)360));
+						
+			//spawn(...) just checks it against a list of pre-approved classes and rejects it if not in there.  Giants fail this test.
+			//spawnCreature seems to be more lenient, as long as it's a LivingEntity.
 			if (LivingEntity.class.isAssignableFrom(type))
 				ent = p.getWorld().spawnCreature(loc, CreatureType.fromName(type.getSimpleName()));
+			else if (Item.class.isAssignableFrom(type))
+			{
+				if (Material.getMaterial(itemType) == null||itemType==0)
+				{
+					Spawn.warning("Player " + p.getName() + " tried to spawn item type " + itemType + " which would have crashed the client");
+					return null;
+				}
+				ent = p.getWorld().dropItem(loc, new ItemStack(itemType, itemAmount, itemDamage, itemData));
+			}
 			else
 				ent = p.getWorld().spawn(loc, type);
 			if (ent == null)
 			{
-				plugin.warning("Some things just weren't meant to be spawned - null entity detected.");
+				Spawn.warning("Some things just weren't meant to be spawned - null entity detected.");
 				plugin.flag(type);
 				return null;
 			}
+			ent.teleport(loc);
+
 			
 			//ANGRY
 			
@@ -298,7 +344,7 @@ public class Ent {
 			{					
 				Entity rider=passenger.spawnSingle(p, plugin, loc);
 				if (rider instanceof Minecart)
-					plugin.warning("Please do not try having a minecart ride a mob, unless you want it to ride the server too.");
+					Spawn.warning("Please do not try having a minecart ride a mob, unless you want it to ride the server too.");
 				else
 					ent.setPassenger(rider);
 			}
@@ -329,27 +375,37 @@ public class Ent {
 			
 			//VELOCITY
 			
-			if (velocity!=0)
+			if (velocity)
 			{
-				Vector vel = Vector.getRandom();
-				vel.setX((vel.getX()*2-1)*velocity);
-				vel.setY(vel.getY()*velocity);
-				vel.setZ((vel.getZ()*2-1)*velocity);
+				Vector vel = ent.getLocation().getDirection();
+
+				vel.setX(vel.getX()*velRandom + velValue.getX());
+				vel.setY(Math.abs(vel.getY())*velRandom + velValue.getY()); // Mobs usually get spawned on top of blocks; negative Y means dead stop.
+				vel.setZ(vel.getZ()*velRandom + velValue.getZ());
+				
+				double hMagnitude = Math.sqrt(Math.pow(vel.getX(), 2) + Math.pow(vel.getZ(), 2));
+				if (hMagnitude > plugin.hSpeedLimit)
+				{
+					double coeff = plugin.hSpeedLimit / hMagnitude;
+					vel.setX(vel.getX() * coeff);
+					vel.setY(vel.getY() * coeff);
+					vel.setZ(vel.getZ() * coeff);
+				}
 				ent.setVelocity(vel);
 			}
 			
 			return ent;
 		} catch(InvocationTargetException e)
 		{
-			plugin.warning("Target " + type.getSimpleName() + " has a method for doing something, but threw an exception when it was invoked:");
+			Spawn.warning("Target " + type.getSimpleName() + " has a method for doing something, but threw an exception when it was invoked:");
 			e.printStackTrace();
 		} catch(IllegalAccessException e)
 		{
-			plugin.warning("Target " + type.getSimpleName() + " has a method for doing something, but threw an exception when it was invoked:");
+			Spawn.warning("Target " + type.getSimpleName() + " has a method for doing something, but threw an exception when it was invoked:");
 			e.printStackTrace();
 		} catch(IllegalArgumentException e)
 		{
-			plugin.warning("Some things just weren't meant to be spawned:");
+			Spawn.warning("Some things just weren't meant to be spawned:");
 			e.printStackTrace();
 			plugin.flag(type);
 		}
@@ -367,7 +423,11 @@ public class Ent {
 		{
 			return passenger.description() + " riding a " + alias;
 		}
-		return alias;
+		return description;
 	}
-
+	
+	public String toString()
+	{
+		return description();
+	}
 }
