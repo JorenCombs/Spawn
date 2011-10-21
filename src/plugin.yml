@@ -1,7 +1,7 @@
 name: Spawn
 main: joren.spawn.Spawn
-version: 0.1
-description: A special version of SpawnMobLite
+version: 0.2
+description: Spawn any entity; do maniacal things with them
 commands:
   spawn:
     description:

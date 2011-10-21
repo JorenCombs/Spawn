@@ -137,6 +137,8 @@ public class Spawn extends JavaPlugin {
 		cfg.setProperty("alias.chicken", Arrays.asList("Chicken"));
 		cfg.setProperty("alias.cow", Arrays.asList("Cow"));
 		cfg.setProperty("alias.creeper", Arrays.asList("Creeper"));
+		cfg.setProperty("alias.supercreeper", Arrays.asList("Creeper"));
+		cfg.setProperty("alias.supercreeper-parameters", "/a");
 		cfg.setProperty("alias.enderman", Arrays.asList("Enderman"));
 		cfg.setProperty("alias.endermen", Arrays.asList("Enderman"));
 		cfg.setProperty("alias.ghast", Arrays.asList("Ghast"));
@@ -152,12 +154,14 @@ public class Spawn extends JavaPlugin {
 		cfg.setProperty("alias.spider", Arrays.asList("Spider"));
 		cfg.setProperty("alias.squid", Arrays.asList("Squid"));
 		cfg.setProperty("alias.wolf", Arrays.asList("Wolf"));
+		cfg.setProperty("alias.werewolf", Arrays.asList("Wolf"));
+		cfg.setProperty("alias.werewolf-parameters", "/a");
 		cfg.setProperty("alias.dog", Arrays.asList("Wolf"));
 		cfg.setProperty("alias.zombie", Arrays.asList("Zombie"));
-		
 		cfg.setProperty("alias.friendly", Arrays.asList("Chicken", "Cow", "Pig", "Sheep", "Squid"));
 		cfg.setProperty("alias.hostile", Arrays.asList("CaveSpider", "Creeper", "Enderman", "Ghast", "Giant", "Silverfish", "Skeleton", "Slime", "Spider", "Zombie"));
 		cfg.setProperty("alias.provoke", Arrays.asList("Enderman", "PigZombie", "Wolf"));
+		cfg.setProperty("alias.provoke-parameters", "/a");
 		cfg.setProperty("alias.burnable", Arrays.asList("Enderman", "Skeleton", "Zombie"));
 		cfg.setProperty("alias.day", Arrays.asList("Chicken", "Cow", "Pig", "Sheep", "Squid"));
 		cfg.setProperty("alias.night", Arrays.asList("Creeper", "Enderman", "Skeleton", "Spider", "Zombie"));
@@ -166,7 +170,9 @@ public class Spawn extends JavaPlugin {
 		cfg.setProperty("alias.flying", Arrays.asList("Ghast"));
 		cfg.setProperty("alias.mob", Arrays.asList("CaveSpider", "Chicken", "Creeper", "Cow", "Enderman", "Pig", "PigZombie", "Sheep", "Silverfish", "Skeleton", "Slime", "Spider", "Squid", "Wolf", "Zombie"));
 		cfg.setProperty("alias.kill", Arrays.asList("CaveSpider", "Chicken", "Creeper", "Cow", "Enderman", "Ghast", "Giant", "Pig", "PigZombie", "Sheep", "Silverfish", "Skeleton", "Slime", "Spider", "Squid", "Wolf", "Zombie"));
-
+		cfg.setProperty("alias.meat", Arrays.asList("Pig, Cow, Chicken"));
+		cfg.setProperty("alias.meat-parameters", "/f:60");
+		
 		//Transit
 		cfg.setProperty("alias.boat", Arrays.asList("Boat"));
 		cfg.setProperty("alias.cart", Arrays.asList("Minecart"));
@@ -199,6 +205,13 @@ public class Spawn extends JavaPlugin {
 		cfg.setProperty("alias.orb", Arrays.asList("ExperienceOrb"));
 		cfg.setProperty("alias.xp", Arrays.asList("ExperienceOrb"));
 		cfg.setProperty("alias.xporb", Arrays.asList("ExperienceOrb"));
+		cfg.setProperty("alias.item", Arrays.asList("Item"));
+		cfg.setProperty("alias.mirage", Arrays.asList("Item"));
+		cfg.setProperty("alias.mirage-parameters", "/i:264,0");
+		cfg.setProperty("alias.fireworks", Arrays.asList("Item"));
+		cfg.setProperty("alias.fireworks-parameters", "/i:331,0/f:60/v:2");
+		
+		
 
 		//Example Player List
 		cfg.setProperty("player-alias.example", Arrays.asList("JohnDoe", "JohnDoesBrother"));
