@@ -107,10 +107,10 @@ public class Spawn extends JavaPlugin {
 		else
 		{
 			cfg.load();
-			sizeLimit = cfg.getInt("spawn.size-limit", 100);
-			spawnLimit = cfg.getInt("spawn.spawn-limit", 300);
-			hSpeedLimit = cfg.getDouble("spawn.horizontal-speed-limit", 10);
-			permissions = cfg.getBoolean("spawn.use-permissions", true);
+			sizeLimit = cfg.getInt("settings.size-limit", 100);
+			spawnLimit = cfg.getInt("settings.spawn-limit", 300);
+			hSpeedLimit = cfg.getDouble("settings.horizontal-speed-limit", 10);
+			permissions = cfg.getBoolean("settings.use-permissions", true);
 			neverSpawn = cfg.getStringList("never.spawn", neverSpawn);
 			neverKill = cfg.getStringList("never.kill", neverKill);
 			if (permissions)
@@ -217,7 +217,7 @@ public class Spawn extends JavaPlugin {
 		cfg.setProperty("player-alias.example", Arrays.asList("JohnDoe", "JohnDoesBrother"));
 		
 
-		permissions = true;
+		permissions = false;
 		spawnLimit = 100;
 		sizeLimit = 50;
 		hSpeedLimit = 10;
@@ -240,10 +240,10 @@ public class Spawn extends JavaPlugin {
 	{
 		info("Saving configuration file...");
 		File dir = new File(path);
-		cfg.setProperty("spawn.use-permissions", permissions);
-		cfg.setProperty("spawn.spawn-limit", spawnLimit);
-		cfg.setProperty("spawn.size-limit", sizeLimit);
-		cfg.setProperty("spawn.horizontal-speed-limit", hSpeedLimit);
+		cfg.setProperty("settings.use-permissions", permissions);
+		cfg.setProperty("settings.spawn-limit", spawnLimit);
+		cfg.setProperty("settings.size-limit", sizeLimit);
+		cfg.setProperty("settings.horizontal-speed-limit", hSpeedLimit);
 		cfg.setProperty("never.spawn", neverSpawn);
 		cfg.setProperty("never.kill", neverKill);
 		if(!dir.exists())
