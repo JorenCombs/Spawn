@@ -982,10 +982,10 @@ public class Spawn extends JavaPlugin {
 								return false;
 							}
 						}
-						if (count > spawnLimit)
+						if (count > (spawnLimit/passengerList.length))
 						{
 							info("Player " + sender.getName() + " tried to spawn more than " + spawnLimit + " entities.");
-							count = spawnLimit;
+							count = spawnLimit/passengerList.length;
 						}
 						if (index.spawn(player, this, loc, count))
 							sender.sendMessage(ChatColor.BLUE + "Spawned " + count + " " + index.description());
