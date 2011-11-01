@@ -1,24 +1,13 @@
 name: Spawn
 main: joren.spawn.Spawn
-version: 0.2
+version: 0.2.2
 description: Spawn any entity; do maniacal things with them
 commands:
-  spawn:
+  ent:
+    aliases: [spawn, sp, s, spawn-entity, se]
     description:
     usage:
-  sp:
+  ent-admin:
+    aliases: [spawn-admin, sp-admin, s-admin, spawn-entity-admin, se-admin]
     description:
-    usage:
-  s:
-    description:
-    usage:
-  spawn-admin:
-    description:
-    usage:
-  sp-admin:
-    description:
-    usage:
-  s-admin:
-    description:
-    usage:
-  
+    usage:  

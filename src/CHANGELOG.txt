@@ -1,6 +1,14 @@
+v0.2.2 - 2011-11-01
+- Command handling.  I always thought that /spawn should be used to, you know, SPAWN something :) but apparently
+some plugins use /spawn to teleport players back to the original starting location of the current world.
+The plugin now therefore only explicitly reserves /ent and /ent-admin.  /spawn, /sp, /s, /spawn-entity are now
+considered aliases, and will not direct to this plugin unless nothing else registers them as commands, in which
+case they will work as normal. 
+
 v0.2.1 - 2011-10-24
 - Config file:  renamed spawn to settings to avoid confusion with similarly named subsections
-- Config file:  use-permissions defaults to false to avoid exceptions when running without perms we can recognize.  Want this plugin to run "out of the box" without tweaking in as many circumstances as possible
+- Config file:  use-permissions defaults to false to avoid exceptions when running without perms we can recognize.
+I want this plugin to run "out of the box" without tweaking in as many circumstances as possible
 - spawnLimit now counts every passenger instead of treating the whole combo as one unit 
 
 v0.2 - 2011-10-22

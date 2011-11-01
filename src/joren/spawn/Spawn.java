@@ -49,7 +49,7 @@ public class Spawn extends JavaPlugin {
 	/** Location of the config YML file */
 	protected static String config = path + File.separator + name + ".yml";
 	/** Header used for console and player output messages */
-	protected static String header = "[Spawn] ";
+	protected static String header = "[" + name + "] ";
 	/** Represents the plugin's YML configuration */
 	protected static List<String> neverSpawn = new ArrayList<String>();
 	protected static List<String> neverKill = new ArrayList<String>();
@@ -413,7 +413,7 @@ public class Spawn extends JavaPlugin {
 	public boolean onCommand(CommandSender sender, Command command, String commandLabel, String[] args)
 	{
 		int[] ignore = {8, 9};
-		if (command.getName().equalsIgnoreCase("spawn") || command.getName().equalsIgnoreCase("sp") || command.getName().equalsIgnoreCase("s"))
+		if (command.getName().equalsIgnoreCase("ent"))
 		{
 			if (allowedTo(sender, "spawn"))
 			{
@@ -1001,7 +1001,7 @@ public class Spawn extends JavaPlugin {
 				}
 			}
 		}
-		else if (command.getName().equalsIgnoreCase("spawn-admin") || command.getName().equalsIgnoreCase("sp-admin") || command.getName().equalsIgnoreCase("s-admin"))
+		else if (command.getName().equalsIgnoreCase("ent-admin"))
 		{
 			if (allowedTo(sender, "spawn-admin"))
 			{
@@ -1057,6 +1057,7 @@ public class Spawn extends JavaPlugin {
 			sender.sendMessage(ChatColor.YELLOW + "Saves Spawn's configuration file");
 			sender.sendMessage(ChatColor.GREEN + "/spawn-admin reset");
 			sender.sendMessage(ChatColor.RED + "Overwrites Spawn's configuration file with default settings");
+			sender.sendMessage(ChatColor.YELLOW + "Alternative commands: " + ChatColor.WHITE + "/ent-admin, /spawn-entity-admin, /sp-admin, /se-admin, /s-admin");
 		}
 		if (allowedTo(sender, "spawn.spawn") && sender instanceof Player)
 		{
@@ -1132,6 +1133,7 @@ public class Spawn extends JavaPlugin {
 				sender.sendMessage(ChatColor.BLUE + "/spawn <entity>/v:<x>,<y>,<z>/v:<offsetvelocity>");
 				sender.sendMessage(ChatColor.YELLOW + "Spawns <entity> with specified direction plus an offset in a random direction");
 			}
+			sender.sendMessage(ChatColor.YELLOW + "Alternative commands: " + ChatColor.WHITE + "/ent, /spawn-entity, /sp, /se, /s");
 		}
 		if (allowedTo(sender, "spawn.kill"))
 		{
