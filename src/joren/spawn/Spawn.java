@@ -1003,7 +1003,7 @@ public class Spawn extends JavaPlugin {
 		}
 		else if (command.getName().equalsIgnoreCase("ent-admin"))
 		{
-			if (allowedTo(sender, "spawn-admin"))
+			if (allowedTo(sender, "spawn.admin"))
 			{
 				if ((args.length > 0)) 
 				{

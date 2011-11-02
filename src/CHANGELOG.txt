@@ -1,5 +1,5 @@
 v0.2.2 - 2011-11-01
-- Command handling.  I always thought that /spawn should be used to, you know, SPAWN something :) but apparently
+- Command handling:  I always thought that /spawn should be used to, you know, SPAWN something :) but apparently
 some plugins use /spawn to teleport players back to the original starting location of the current world.
 The plugin now therefore only explicitly reserves /ent and /ent-admin.  /spawn, /sp, /s, /spawn-entity are now
 considered aliases, and will not direct to this plugin unless nothing else registers them as commands, in which
