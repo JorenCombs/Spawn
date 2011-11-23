@@ -4,6 +4,7 @@ some plugins use /spawn to teleport players back to the original starting locati
 The plugin now therefore only explicitly reserves /ent and /ent-admin.  /spawn, /sp, /s, /spawn-entity are now
 considered aliases, and will not direct to this plugin unless nothing else registers them as commands, in which
 case they will work as normal. 
+- Fixed permissions mistake with spawn-admin command
 
 v0.2.1 - 2011-10-24
 - Config file:  renamed spawn to settings to avoid confusion with similarly named subsections

@@ -24,7 +24,6 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 import org.bukkit.util.config.Configuration;
-import org.bukkit.util.config.ConfigurationNode;
 
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
@@ -38,10 +37,11 @@ import com.nijikokun.bukkit.Permissions.Permissions;
  * by jordanneil23).  However, it has been nuked and rewritten enough that there probably isn't much of
  * the original code left.  Also uses TargetBlock code from toi and Raphfrk
  */
+@SuppressWarnings("deprecation")
 public class Spawn extends JavaPlugin {
 	public static java.util.logging.Logger log = java.util.logging.Logger.getLogger("Minecraft");
 	/** Handle to access the Permissions plugin */
-	public static PermissionHandler Permissions;
+	public static PermissionHandler permissions;
 	/** Name of the plugin, used in output messages */
 	protected static String name = "Spawn";
 	/** Path where the plugin's saved information is located */
@@ -53,9 +53,9 @@ public class Spawn extends JavaPlugin {
 	/** Represents the plugin's YML configuration */
 	protected static List<String> neverSpawn = new ArrayList<String>();
 	protected static List<String> neverKill = new ArrayList<String>();
-	protected static Configuration cfg;
+	protected static Configuration cfg = null;
 	/** True if this plugin is to be used with Permissions, false if not */
-	protected boolean permissions = false;
+	protected boolean usePermissions = false;
 	/** Limitations on how many entities can be spawned and what the maximum size of a spawned entity should be */
 	protected int spawnLimit, sizeLimit;
 	protected double hSpeedLimit;
@@ -110,10 +110,10 @@ public class Spawn extends JavaPlugin {
 			sizeLimit = cfg.getInt("settings.size-limit", 100);
 			spawnLimit = cfg.getInt("settings.spawn-limit", 300);
 			hSpeedLimit = cfg.getDouble("settings.horizontal-speed-limit", 10);
-			permissions = cfg.getBoolean("settings.use-permissions", true);
+			usePermissions = cfg.getBoolean("settings.use-permissions", true);
 			neverSpawn = cfg.getStringList("never.spawn", neverSpawn);
 			neverKill = cfg.getStringList("never.kill", neverKill);
-			if (permissions)
+			if (usePermissions)
 				setupPermissions();
 		}
 		info("done.");
@@ -217,7 +217,7 @@ public class Spawn extends JavaPlugin {
 		cfg.setProperty("player-alias.example", Arrays.asList("JohnDoe", "JohnDoesBrother"));
 		
 
-		permissions = false;
+		usePermissions = false;
 		spawnLimit = 100;
 		sizeLimit = 50;
 		hSpeedLimit = 10;
@@ -240,7 +240,7 @@ public class Spawn extends JavaPlugin {
 	{
 		info("Saving configuration file...");
 		File dir = new File(path);
-		cfg.setProperty("settings.use-permissions", permissions);
+		cfg.setProperty("settings.use-permissions", usePermissions);
 		cfg.setProperty("settings.spawn-limit", spawnLimit);
 		cfg.setProperty("settings.size-limit", sizeLimit);
 		cfg.setProperty("settings.horizontal-speed-limit", hSpeedLimit);
@@ -302,12 +302,13 @@ public class Spawn extends JavaPlugin {
 	{
 		List<Player> list = new ArrayList<Player>();
 		List<String> names = new ArrayList<String>();
-		String params = "";
 		Player[] derp = new Player[0];//Needed for workaround below
 		if (alias == null)
-			return new PlayerAlias(list.toArray(derp), params);
+			return new PlayerAlias(list.toArray(derp), "");
 		names = cfg.getStringList("player-alias." + alias.toLowerCase(), names);
-		params = cfg.getString("alias." + alias.toLowerCase() + "-parameters", params);
+		String params = cfg.getString("alias." + alias.toLowerCase() + "-parameters");
+		if (params == null)
+			params = "";
 		if ((names.size() > 0) && allowedTo(sender, permsPrefix + "." + alias))
 		{
 			for (Iterator<String> i = names.iterator(); i.hasNext();)
@@ -341,23 +342,25 @@ public class Spawn extends JavaPlugin {
 	 * @param permsPrefix: The intended purpose of this list, used as a permissions prefix
 	 * @return Alias: A list of entities combined with parameters.  If no entities were found, returns a size 0 array (not null)
 	 */
+	@SuppressWarnings("unchecked")
 	public Alias lookup(String alias, CommandSender sender, String permsPrefix)
 	{
 		List<Class<Entity>> list = new ArrayList<Class<Entity>>();
 		List<String> names = new ArrayList<String>();
-		String params = "";
 		Class<Entity>[] derp = new Class[0];//Needed for ridiculous workaround below
 		if (alias == null)
-			return new Alias(list.toArray(derp), params);
+			return new Alias(list.toArray(derp), "");
 		if (alias.toLowerCase().startsWith("org.bukkit.entity."))//allow user to specify formal name to avoid conflict (e.g. player named Zombie and not able to use lowercase because of lack of alias, which would be generated after using the formal name once)
 		{
 			if (alias.length() > 18)
 				alias = alias.substring(17);
 			else
-				return new Alias(list.toArray(derp), params);//an empty list since they didn't finish specifying the class
+				return new Alias(list.toArray(derp), "");//an empty list since they didn't finish specifying the class
 		}
 		names = cfg.getStringList("alias." + alias.toLowerCase(), names);
-		params = cfg.getString("alias." + alias.toLowerCase() + "-parameters", params);
+		String params = cfg.getString("alias." + alias.toLowerCase() + "-parameters");
+		if (params == null)
+			params = "";
 		if (names.size() > 0)
 			for (Iterator<String> i = names.iterator(); i.hasNext();)
 			{
@@ -1163,14 +1166,14 @@ public class Spawn extends JavaPlugin {
 	private void setupPermissions()
 	{
 		Plugin test = this.getServer().getPluginManager().getPlugin("Permissions");
-		if (Spawn.Permissions == null) {
+		if (Spawn.permissions == null) {
 			if (test != null) {
-				Spawn.Permissions = ((Permissions)test).getHandler();
+				Spawn.permissions = ((Permissions)test).getHandler();
 				info("Permission system found, plugin enabled");
 			} else {
 				info("Permission system not detected! Please go into the SpawnMob.properties and set use-permissions to false.");
 				info("Please go into the SpawnMob.properties and set use-permissions to false.");
-				permissions = false;
+				usePermissions = false;
 			}
 		}
 	}
@@ -1185,8 +1188,8 @@ public class Spawn extends JavaPlugin {
 	{
 		if (sender.isOp())
 			return true;
-		else if (permissions && sender instanceof Player)
-			return Permissions.has((Player)sender, permission);
+		else if (usePermissions && sender instanceof Player)
+			return permissions.has((Player)sender, permission);
 		return false;
 	}
 	
@@ -1487,4 +1490,3 @@ public class Spawn extends JavaPlugin {
 		log.log(level, header + message);
 	}
 }
-

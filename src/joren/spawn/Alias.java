@@ -1,12 +1,12 @@
 package joren.spawn;
 
 import org.bukkit.entity.Entity;
-import org.bukkit.entity.Player;
 
 public class Alias {
 	private Class<Entity>[] types;
 	private String params;
 	
+	@SuppressWarnings("unchecked")
 	public Alias()
 	{
 		types = new Class[0];
