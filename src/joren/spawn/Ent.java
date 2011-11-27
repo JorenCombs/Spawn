@@ -281,22 +281,34 @@ public class Ent {
 			
 			if (health)
 			{
-				try
+				if (ent instanceof ExperienceOrb)
 				{
-					Method healthMethod = type.getMethod("setHealth", int.class);
-					if ((healthIsPercentage))
+					if (healthIsPercentage)
 					{
-						healthMethod.invoke(ent, (int)((((double)healthValue)/100)* ((double)((LivingEntity)ent).getHealth())));
-						if (ent instanceof ExperienceOrb)
-							((ExperienceOrb)ent).setExperience((int)((((double)healthValue)/100)* ((double)((ExperienceOrb)ent).getExperience())));
+						Spawn.info(String.valueOf(((ExperienceOrb)ent).getExperience()));
+						((ExperienceOrb)ent).setExperience((int)((((double)healthValue)/100)* ((double)((ExperienceOrb)ent).getExperience())));
+						Spawn.info(String.valueOf(((ExperienceOrb)ent).getExperience()));
 					}
 					else
 					{
-						healthMethod.invoke(ent, healthValue);
-						if (ent instanceof ExperienceOrb)
-							((ExperienceOrb)ent).setExperience(healthValue);
+						Spawn.info(String.valueOf(((ExperienceOrb)ent).getExperience()));
+						((ExperienceOrb)ent).setExperience(healthValue);
+						Spawn.info(String.valueOf(((ExperienceOrb)ent).getExperience()));
 					}
-				} catch (NoSuchMethodException e){}
+				}
+				else 
+				{
+					try
+					{
+						Method healthMethod = type.getMethod("setHealth", int.class);
+	
+						if (healthIsPercentage)
+							healthMethod.invoke(ent, (int)((((double)healthValue)/100)* ((double)((LivingEntity)ent).getHealth())));
+						else
+							healthMethod.invoke(ent, healthValue);
+					}
+					catch (NoSuchMethodException e){}
+				}
 			}
 
 			//MOUNT

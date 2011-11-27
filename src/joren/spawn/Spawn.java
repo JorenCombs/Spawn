@@ -1302,14 +1302,17 @@ public class Spawn extends JavaPlugin {
 				
 				if (health)
 				{
+					if (ent instanceof ExperienceOrb)
+					{
+						info(String.valueOf(((ExperienceOrb)ent).getExperience()));
+						if (((ExperienceOrb)ent).getExperience()!=healthValue)
+							return false;
+					}
 					try
 					{
 						Method healthMethod = type.getMethod("getHealth");
 						if ((Integer)healthMethod.invoke(ent)!=healthValue)
 							return false;
-						if (ent instanceof ExperienceOrb)
-							if (((ExperienceOrb)ent).getExperience()!=healthValue)
-								return false;
 					} catch (NoSuchMethodException e){return false;}
 				}
 				
