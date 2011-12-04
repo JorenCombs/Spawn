@@ -470,8 +470,8 @@ public class Spawn extends JavaPlugin {
 							sender.sendMessage(ChatColor.RED + "Invalid mob type.");
 							return false;
 						}
-						int healthValue=100, sizeValue=1;
-						boolean angry = false, color = false, fire = false, health = false, mount = false, size = false, target = false, owned = false, naked = false;
+						int healthValue=100, sizeValue=1, youthValue=0;
+						boolean angry = false, color = false, fire = false, health = false, mount = false, size = false, target = false, owned = false, naked = false, youth = false;
 						PlayerAlias owner=new PlayerAlias(), targets=new PlayerAlias();
 						DyeColor colorCode=DyeColor.WHITE;
 						if (mobParam.length>1)
@@ -641,6 +641,21 @@ public class Spawn extends JavaPlugin {
 										return false;
 									}
 								}
+								else if (paramName.equalsIgnoreCase("y"))
+								{
+									if (allowedTo(sender, "spawn.youth"))
+									{
+										youth = true;
+										try
+										{
+											youthValue = Integer.parseInt(param);
+										} catch (NumberFormatException e)
+										{
+											sender.sendMessage(ChatColor.RED + "Youth parameter must be an integer");
+											return false;
+										}
+									}
+								}
 								else
 								{
 									sender.sendMessage(ChatColor.RED + "Invalid parameter " + paramName);
@@ -655,7 +670,7 @@ public class Spawn extends JavaPlugin {
 							return false;
 						}
 							
-						bodyCount=Kill(sender, targetEnts, radius, angry, color, colorCode, fire, health, healthValue, mount, naked, owned, owner.getPeople(), size, sizeValue, target, targets.getPeople());
+						bodyCount=Kill(sender, targetEnts, radius, angry, color, colorCode, fire, health, healthValue, mount, naked, owned, owner.getPeople(), size, sizeValue, target, targets.getPeople(), youth, youthValue);
 						sender.sendMessage(ChatColor.BLUE + "Killed " + bodyCount + " " + mobParam[0] + "s.");
 						return true;
 					}
@@ -707,12 +722,12 @@ public class Spawn extends JavaPlugin {
 								return false;
 							}
 
-							int healthValue=100, itemType=17, itemAmount=1, size=1, fireTicks=-1;
+							int healthValue=100, itemType=17, itemAmount=1, size=1, fireTicks=-1, youthValue=0;
 							short itemDamage=0;
 							Byte itemData=null;
 							double velRandom=0;
 							Vector velValue = new Vector(0,0,0);
-							boolean setSize = false, health = false, healthIsPercentage = true, angry = false, bounce = false, color = false, mount = false, target = false, tame = false, naked = false, velocity = false;
+							boolean setSize = false, health = false, healthIsPercentage = true, angry = false, bounce = false, color = false, mount = false, target = false, tame = false, naked = false, velocity = false, youth = false;
 							PlayerAlias targets=new PlayerAlias();
 							PlayerAlias owner=new PlayerAlias();
 							DyeColor colorCode=DyeColor.WHITE;
@@ -798,17 +813,16 @@ public class Spawn extends JavaPlugin {
 										{
 											try
 											{
+												health=true;
 												if (param.endsWith("%"))
 												{
 													healthIsPercentage=true;
 													healthValue = Integer.parseInt(param.substring(0, param.indexOf("%")));
-													health=true;
 												}
 												else
 												{
 													healthIsPercentage=false;
 													healthValue = Integer.parseInt(param);
-													health=true;
 												}
 											} catch (NumberFormatException e)
 											{
@@ -954,6 +968,21 @@ public class Spawn extends JavaPlugin {
 											return false;
 										}
 									}
+									else if (paramName.equalsIgnoreCase("y"))
+									{
+										if (allowedTo(sender, "spawn.youth"))
+										{
+											youth = true;
+											try
+											{
+												youthValue = Integer.parseInt(param);
+											} catch (NumberFormatException e)
+											{
+												sender.sendMessage(ChatColor.RED + "Youth parameter must be an integer");
+												return false;
+											}
+										}
+									}
 									else
 									{
 										sender.sendMessage(ChatColor.RED + "Invalid parameter " + paramName);
@@ -962,10 +991,10 @@ public class Spawn extends JavaPlugin {
 								}
 							}
 							index2=index;
-							if (people.length == 0)
-								index = new Ent(results, mobParam[0], angry, bounce, color, colorCode, fireTicks, health, healthIsPercentage, healthValue, itemType, itemAmount, itemDamage, itemData, mount, naked, tame, owner.getPeople(), index2, setSize, size, target, targets.getPeople(), velocity, velRandom, velValue);
+							if (results.length != 0)
+								index = new Ent(results, mobParam[0], angry, bounce, color, colorCode, fireTicks, health, healthIsPercentage, healthValue, itemType, itemAmount, itemDamage, itemData, mount, naked, tame, owner.getPeople(), index2, setSize, size, target, targets.getPeople(), velocity, velRandom, velValue, youth, youthValue);
 							else
-								index = new Person(people, mobParam[0], angry, bounce, color, colorCode, fireTicks, health, healthIsPercentage, healthValue, itemType, itemAmount, itemDamage, itemData, mount, naked, tame, owner.getPeople(), index2, setSize, size, target, targets.getPeople(), velocity, velRandom, velValue);
+								index = new Person(people, mobParam[0], angry, bounce, color, colorCode, fireTicks, health, healthIsPercentage, healthValue, itemType, itemAmount, itemDamage, itemData, mount, naked, tame, owner.getPeople(), index2, setSize, size, target, targets.getPeople(), velocity, velRandom, velValue, youth, youthValue);
 						}
 						
 						if (args.length > 1)
@@ -1136,6 +1165,11 @@ public class Spawn extends JavaPlugin {
 				sender.sendMessage(ChatColor.BLUE + "/spawn <entity>/v:<x>,<y>,<z>/v:<offsetvelocity>");
 				sender.sendMessage(ChatColor.YELLOW + "Spawns <entity> with specified direction plus an offset in a random direction");
 			}
+			if (allowedTo(sender, "spawn.young"))
+			{
+				sender.sendMessage(ChatColor.BLUE + "/spawn <entity>/y:<how young>");
+				sender.sendMessage(ChatColor.YELLOW + "Spawns <entity> with specified youth");
+			}
 			sender.sendMessage(ChatColor.YELLOW + "Alternative commands: " + ChatColor.WHITE + "/ent, /spawn-entity, /sp, /se, /s");
 		}
 		if (allowedTo(sender, "spawn.kill"))
@@ -1242,10 +1276,12 @@ public class Spawn extends JavaPlugin {
 	 * @param sizeValue: Used to decide exactly how big an entity needs to be to die
 	 * @param target: If true, only kills entities that currently have a target
 	 * @param targets: If set and target is true, only killed entities with these targets.  If null and target is true, kills entities with ANY target
+	 * @param youth: If true, only kills entities of a certain age
+	 * @param youthValue: If set and youth is true, only kills entities of this age
 	 * 
 	 * @return boolean: true is ent was killed, false if it lived
 	 */
-	private boolean KillSingle(Entity ent, Class<Entity>[] types, boolean angry, boolean color, DyeColor colorCode, boolean fire, boolean health, int healthValue, boolean mount, boolean naked, boolean owned, AnimalTamer[] owner, boolean size, int sizeValue, boolean target, Player[] targets)
+	private boolean KillSingle(Entity ent, Class<Entity>[] types, boolean angry, boolean color, DyeColor colorCode, boolean fire, boolean health, int healthValue, boolean mount, boolean naked, boolean owned, AnimalTamer[] owner, boolean size, int sizeValue, boolean target, Player[] targets, boolean youth, int youthValue)
 	{
 		Class<? extends Entity> type = ent.getClass();
 		try
@@ -1385,6 +1421,21 @@ public class Spawn extends JavaPlugin {
 					}
 				} catch (NoSuchMethodException e){if (target) return false;}
 				
+				//YOUTH (default is to kill regardless of age)
+				Method ageMethod;
+				if (youth)
+				{
+					try
+					{
+						ageMethod = type.getMethod("getAge");
+						int age = (Integer)ageMethod.invoke(ent);
+						if (age != youthValue)
+							return false;
+					} catch (NoSuchMethodException e){
+					}
+				}
+				
+				//DONE
 				ent.remove();
 				return true;
 			}
@@ -1420,10 +1471,12 @@ public class Spawn extends JavaPlugin {
 	 * @param sizeValue: Used to decide exactly how big an entity needs to be to die
 	 * @param target: If true, only kills entities that currently have a target
 	 * @param targets: If set and target is true, only killed entities with these targets.  If null and target is true, kills entities with ANY target
+	 * @param youth: If true, only kills entities of a certain age
+	 * @param youthValue: If set and youth is true, only kills entities of this age
 	 * 
 	 * @return int: how many entities were slain
 	 */
-	public int Kill(CommandSender sender, Class<Entity>[] types, int radius, boolean angry, boolean color, DyeColor colorCode, boolean fire, boolean health, int healthValue, boolean mount, boolean naked, boolean owned, Player[] owner, boolean size, int sizeValue, boolean target, Player[] targets)
+	public int Kill(CommandSender sender, Class<Entity>[] types, int radius, boolean angry, boolean color, DyeColor colorCode, boolean fire, boolean health, int healthValue, boolean mount, boolean naked, boolean owned, Player[] owner, boolean size, int sizeValue, boolean target, Player[] targets, boolean youth, int youthValue)
 	{
 		int bodycount=0;
 		List<Entity> ents;
@@ -1434,7 +1487,7 @@ public class Spawn extends JavaPlugin {
 			{
 				Entity ent = iterator.next();
 				if (ent.getLocation().distance(((Player)sender).getLocation()) <= radius)
-					if (KillSingle(ent, types, angry, color, colorCode, fire, health, healthValue, mount, naked, owned, owner, size, sizeValue, target, targets))
+					if (KillSingle(ent, types, angry, color, colorCode, fire, health, healthValue, mount, naked, owned, owner, size, sizeValue, target, targets, youth, youthValue))
 						bodycount++;
 			}
 		}
@@ -1446,7 +1499,7 @@ public class Spawn extends JavaPlugin {
 				for(Iterator<Entity> iterator = ents.iterator(); iterator.hasNext();)
 				{
 					Entity ent = iterator.next();
-					if (KillSingle(ent, types, angry, color, colorCode, fire, health, healthValue, mount, naked, owned, owner, size, sizeValue, target, targets))
+					if (KillSingle(ent, types, angry, color, colorCode, fire, health, healthValue, mount, naked, owned, owner, size, sizeValue, target, targets, youth, youthValue))
 						bodycount++;
 				}
 			}

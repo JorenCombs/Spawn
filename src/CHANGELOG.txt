@@ -1,3 +1,6 @@
+v0.2.3 - 2011-12-04
+- Entities take priority over players; e.g. typing /spawn spider won't teleport a player named Spider123 to your location.
+
 v0.2.2 - 2011-11-01
 - Command handling:  I always thought that /spawn should be used to, you know, SPAWN something :) but apparently
 some plugins use /spawn to teleport players back to the original starting location of the current world.

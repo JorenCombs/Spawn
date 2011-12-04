@@ -7,6 +7,7 @@ import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.AnimalTamer;
+import org.bukkit.entity.Cow;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ExperienceOrb;
@@ -34,7 +35,7 @@ public class Ent {
 	/** This entity's passenger, if any */
 	protected Ent passenger;
 	/** Values used for modifying spawned entities */
-	protected int sizeValue=1, healthValue=100, fireTicks=-1, itemType=17, itemAmount=1;
+	protected int sizeValue=1, healthValue=100, fireTicks=-1, itemType=17, itemAmount=1, youthValue=0;
 	/** Values used for modifying spawned entities */
 	protected double velRandom=0;
 	/** Values used for modifying spawned entities */
@@ -43,7 +44,7 @@ public class Ent {
 	protected short itemDamage=0;
 	protected Byte itemData=null;
 	/** Booleans generally indicating whether specified values should be set (true) or ignored (false) */
-	protected boolean angry=false, bounce=false, color=false, health=false, healthIsPercentage=true, mount=false, naked=false, owned=false, size=false, target=false, velocity=false;
+	protected boolean angry=false, bounce=false, color=false, health=false, healthIsPercentage=true, mount=false, naked=false, owned=false, size=false, target=false, velocity=false, youth=false;
 	/** Used for setting an entity's color (e.g. sheep)*/
 	protected DyeColor colorCode=DyeColor.WHITE;
 	/** Used for dealing with owners and possible targets for entities that support them */
@@ -73,8 +74,10 @@ public class Ent {
 	 * @param velocity: if true, will set the entity's velocity using velValue and/or velRandom
 	 * @param velValue: How (specifically) fast you want the entity to be going when it spawns
 	 * @param velRandom: How (randomly) fast you want the entity to be going when it spawns
+	 * @param youth: If true, age will be set to youthValue
+	 * @param youthValue: How young you want the entity
 	 */
-	public Ent(Class<Entity>[] types, String alias, boolean angry, boolean bounce, boolean color, DyeColor colorCode, int fireTicks, boolean health, boolean healthIsPercentage, int healthValue, int itemType, int itemAmount, short itemDamage, Byte itemData, boolean mount, boolean naked, boolean owned, Player[] owner, Ent passenger, boolean size, int sizeValue, boolean target, Player[] targets, boolean velocity, double velRandom, Vector velValue) {
+	public Ent(Class<Entity>[] types, String alias, boolean angry, boolean bounce, boolean color, DyeColor colorCode, int fireTicks, boolean health, boolean healthIsPercentage, int healthValue, int itemType, int itemAmount, short itemDamage, Byte itemData, boolean mount, boolean naked, boolean owned, Player[] owner, Ent passenger, boolean size, int sizeValue, boolean target, Player[] targets, boolean velocity, double velRandom, Vector velValue, boolean youth, int youthValue) {
 		this.types=types;
 		this.alias=alias;
 		this.angry=angry;
@@ -102,6 +105,8 @@ public class Ent {
 		this.velocity=velocity;
 		this.velValue=velValue;
 		this.velRandom=velRandom;
+		this.youth=youth;
+		this.youthValue=youthValue;
 		
 		if (types!=null)
 			if (types.length==1 && Item.class.isAssignableFrom(pick()))
@@ -405,6 +410,18 @@ public class Ent {
 					vel.setZ(vel.getZ() * coeff);
 				}
 				ent.setVelocity(vel);
+			}
+			
+			//YOUTH
+			
+			if (youth)
+			{
+				Method ageMethod;
+				try
+				{
+					ageMethod = type.getMethod("setAge", int.class);
+					ageMethod.invoke(ent, youthValue);
+				} catch (NoSuchMethodException e){}
 			}
 			
 			return ent;

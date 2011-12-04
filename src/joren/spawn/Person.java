@@ -44,9 +44,11 @@ public class Person extends Ent {
 	 * @param targets: A list of potential targets for the entity to choose from
 	 * @param velocity: How (specifically) fast you want the entity to be going when it spawns
 	 * @param velRandom: How (randomly) fast you want the entity to be going when it spawns
+	 * @param youth: If true, age will be set to youthValue
+	 * @param youthValue: How young you want the entity
 	 */
-	public Person(Player[] people, String alias, boolean angry, boolean bounce, boolean color, DyeColor colorCode, int fireTicks, boolean health, boolean healthIsPercentage, int healthValue, int itemType, int itemAmount, short itemDamage, Byte itemData, boolean mount, boolean naked, boolean owned, Player[] owner, Ent passenger, boolean size, int sizeValue, boolean target, Player[] targets, boolean velocity, double velRandom, Vector velValue) {
-		super (null, alias, angry, bounce, color, colorCode, fireTicks, health, healthIsPercentage, healthValue, itemType, itemAmount, itemDamage, itemData, mount, naked, owned, owner, passenger, size, sizeValue, target, targets, velocity, velRandom, velValue);
+	public Person(Player[] people, String alias, boolean angry, boolean bounce, boolean color, DyeColor colorCode, int fireTicks, boolean health, boolean healthIsPercentage, int healthValue, int itemType, int itemAmount, short itemDamage, Byte itemData, boolean mount, boolean naked, boolean owned, Player[] owner, Ent passenger, boolean size, int sizeValue, boolean target, Player[] targets, boolean velocity, double velRandom, Vector velValue, boolean youth, int youthValue) {
+		super (null, alias, angry, bounce, color, colorCode, fireTicks, health, healthIsPercentage, healthValue, itemType, itemAmount, itemDamage, itemData, mount, naked, owned, owner, passenger, size, sizeValue, target, targets, velocity, velRandom, velValue, youth, youthValue);
 		this.people = people;
 	}
 
@@ -95,6 +97,7 @@ public class Person extends Ent {
 
 		person.leaveVehicle();
 		person.teleport(loc);
+
 		if (passenger!=null)
 		{
 			Entity rider=passenger.spawnSingle(p, plugin, loc);
