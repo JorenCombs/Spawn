@@ -130,34 +130,83 @@ public class Spawn extends JavaPlugin {
 		info("Resetting configuration file with default values...");
 		cfg = new Configuration(new File(config));
 
-		neverSpawn = Arrays.asList("Animals", "Creature", "Entity", "Explosive", "FallingSand", "Fish", "Flying", "HumanEntity", "LivingEntity", "Monster", "Painting", "Player", "Projectile", "Vehicle", "WaterMob");
-		neverKill = Arrays.asList("Animals", "Creature", "Entity", "Explosive", "FallingSand", "Fish", "Flying", "HumanEntity", "LivingEntity", "Monster", "Painting", "Player", "Projectile", "Vehicle", "WaterMob");
+		neverSpawn = Arrays.asList("Animals", "AnimalTamer", "ComplexEntityPart", "ComplexLivingEntity", "Creature", "Entity", "Explosive", "FallingSand", "Fish", "Flying", "HumanEntity", "LivingEntity", "Monster", "NPC", "Painting", "Player", "Projectile", "Tameable", "Vehicle", "WaterMob");
+		neverKill = Arrays.asList("Animals", "AnimalTamer", "ComplexEntityPart", "ComplexLivingEntity", "Creature", "Entity", "Explosive", "FallingSand", "Fish", "Flying", "HumanEntity", "LivingEntity", "Monster", "NPC", "Painting", "Player", "Projectile", "Tameable", "Vehicle", "WaterMob");
 
+		cfg.setProperty("alias.blaze", Arrays.asList("Blaze"));
+		cfg.setProperty("alias.blazes", Arrays.asList("Blaze"));
 		cfg.setProperty("alias.cavespider", Arrays.asList("CaveSpider"));
+		cfg.setProperty("alias.cavespiders", Arrays.asList("CaveSpider"));
 		cfg.setProperty("alias.chicken", Arrays.asList("Chicken"));
+		cfg.setProperty("alias.chickens", Arrays.asList("Chicken"));
 		cfg.setProperty("alias.cow", Arrays.asList("Cow"));
+		cfg.setProperty("alias.cows", Arrays.asList("Cow"));
 		cfg.setProperty("alias.creeper", Arrays.asList("Creeper"));
+		cfg.setProperty("alias.creepers", Arrays.asList("Creeper"));
 		cfg.setProperty("alias.supercreeper", Arrays.asList("Creeper"));
 		cfg.setProperty("alias.supercreeper-parameters", "/a");
+		cfg.setProperty("alias.supercreepers", Arrays.asList("Creeper"));
+		cfg.setProperty("alias.supercreepers-parameters", "/a");
+		cfg.setProperty("alias.enderdragon", Arrays.asList("EnderDragon"));
+		cfg.setProperty("alias.enderdragons", Arrays.asList("EnderDragon"));
+		cfg.setProperty("alias.dragon", Arrays.asList("EnderDragon"));
+		cfg.setProperty("alias.dragons", Arrays.asList("EnderDragon"));
 		cfg.setProperty("alias.enderman", Arrays.asList("Enderman"));
 		cfg.setProperty("alias.endermen", Arrays.asList("Enderman"));
 		cfg.setProperty("alias.ghast", Arrays.asList("Ghast"));
+		cfg.setProperty("alias.ghasts", Arrays.asList("Ghast"));
 		cfg.setProperty("alias.giant", Arrays.asList("Giant"));
+		cfg.setProperty("alias.giants", Arrays.asList("Giant"));
+		cfg.setProperty("alias.magmacube", Arrays.asList("MagmaCube"));
+		cfg.setProperty("alias.magmacubes", Arrays.asList("MagmaCube"));
+		cfg.setProperty("alias.netherslime", Arrays.asList("MagmaCube"));
+		cfg.setProperty("alias.netherslimes", Arrays.asList("MagmaCube"));
+		cfg.setProperty("alias.magma", Arrays.asList("MagmaCube"));
+		cfg.setProperty("alias.magmas", Arrays.asList("MagmaCube"));
+		cfg.setProperty("alias.monster", Arrays.asList("Monster"));
+		cfg.setProperty("alias.monsters", Arrays.asList("Monster"));
+		cfg.setProperty("alias.mushroomcow", Arrays.asList("MushroomCow"));
+		cfg.setProperty("alias.mushroomcows", Arrays.asList("MushroomCow"));
+		cfg.setProperty("alias.mooshroomcow", Arrays.asList("MushroomCow"));
+		cfg.setProperty("alias.mooshroomcows", Arrays.asList("MushroomCow"));
+		cfg.setProperty("alias.mooshroom", Arrays.asList("MushroomCow"));
+		cfg.setProperty("alias.mooshrooms", Arrays.asList("MushroomCow"));
 		cfg.setProperty("alias.pig", Arrays.asList("Pig"));
+		cfg.setProperty("alias.pigs", Arrays.asList("Pig"));
 		cfg.setProperty("alias.pigzombie", Arrays.asList("PigZombie"));
+		cfg.setProperty("alias.pigzombies", Arrays.asList("PigZombie"));
 		cfg.setProperty("alias.zombiepigman", Arrays.asList("PigZombie"));
+		cfg.setProperty("alias.zombiepigmen", Arrays.asList("PigZombie"));
 		cfg.setProperty("alias.pigman", Arrays.asList("PigZombie"));
+		cfg.setProperty("alias.pigmen", Arrays.asList("PigZombie"));
 		cfg.setProperty("alias.sheep", Arrays.asList("Sheep"));
 		cfg.setProperty("alias.silverfish", Arrays.asList("Silverfish"));
 		cfg.setProperty("alias.skeleton", Arrays.asList("Skeleton"));
+		cfg.setProperty("alias.skeletons", Arrays.asList("Skeleton"));
 		cfg.setProperty("alias.slime", Arrays.asList("Slime"));
+		cfg.setProperty("alias.slimes", Arrays.asList("Slime"));
+		cfg.setProperty("alias.snowman", Arrays.asList("Snowman"));
+		cfg.setProperty("alias.snowmen", Arrays.asList("Snowman"));
 		cfg.setProperty("alias.spider", Arrays.asList("Spider"));
+		cfg.setProperty("alias.spiders", Arrays.asList("Spider"));
 		cfg.setProperty("alias.squid", Arrays.asList("Squid"));
+		cfg.setProperty("alias.squids", Arrays.asList("Squid"));
+		cfg.setProperty("alias.villager", Arrays.asList("Villager"));
+		cfg.setProperty("alias.villagers", Arrays.asList("Villager"));
+		cfg.setProperty("alias.npc", Arrays.asList("Villager"));
+		cfg.setProperty("alias.npcs", Arrays.asList("Villager"));
+		cfg.setProperty("alias.testificate", Arrays.asList("Villager"));
+		cfg.setProperty("alias.testificates", Arrays.asList("Villager"));
 		cfg.setProperty("alias.wolf", Arrays.asList("Wolf"));
+		cfg.setProperty("alias.wolves", Arrays.asList("Wolf"));
 		cfg.setProperty("alias.werewolf", Arrays.asList("Wolf"));
 		cfg.setProperty("alias.werewolf-parameters", "/a");
+		cfg.setProperty("alias.werewolves", Arrays.asList("Wolf"));
+		cfg.setProperty("alias.werewolves-parameters", "/a");
 		cfg.setProperty("alias.dog", Arrays.asList("Wolf"));
+		cfg.setProperty("alias.dogs", Arrays.asList("Wolf"));
 		cfg.setProperty("alias.zombie", Arrays.asList("Zombie"));
+		cfg.setProperty("alias.zombies", Arrays.asList("Zombie"));
 		cfg.setProperty("alias.friendly", Arrays.asList("Chicken", "Cow", "Pig", "Sheep", "Squid"));
 		cfg.setProperty("alias.hostile", Arrays.asList("CaveSpider", "Creeper", "Enderman", "Ghast", "Giant", "Silverfish", "Skeleton", "Slime", "Spider", "Zombie"));
 		cfg.setProperty("alias.provoke", Arrays.asList("Enderman", "PigZombie", "Wolf"));
@@ -175,25 +224,40 @@ public class Spawn extends JavaPlugin {
 		
 		//Transit
 		cfg.setProperty("alias.boat", Arrays.asList("Boat"));
+		cfg.setProperty("alias.boats", Arrays.asList("Boat"));
 		cfg.setProperty("alias.cart", Arrays.asList("Minecart"));
+		cfg.setProperty("alias.carts", Arrays.asList("Minecart"));
 		cfg.setProperty("alias.minecart", Arrays.asList("Minecart"));
+		cfg.setProperty("alias.minecarts", Arrays.asList("Minecart"));
 		cfg.setProperty("alias.poweredminecart", Arrays.asList("PoweredMinecart"));
+		cfg.setProperty("alias.poweredminecarts", Arrays.asList("PoweredMinecart"));
+		cfg.setProperty("alias.engine", Arrays.asList("PoweredMinecart"));
+		cfg.setProperty("alias.engines", Arrays.asList("PoweredMinecart"));
 		cfg.setProperty("alias.locomotive", Arrays.asList("PoweredMinecart"));
+		cfg.setProperty("alias.locomotives", Arrays.asList("PoweredMinecart"));
 		cfg.setProperty("alias.storageminecart", Arrays.asList("StorageMinecart"));
+		cfg.setProperty("alias.storageminecarts", Arrays.asList("StorageMinecart"));
 		cfg.setProperty("alias.train", Arrays.asList("Minecart"));
+		cfg.setProperty("alias.trains", Arrays.asList("Minecart"));
 		cfg.setProperty("alias.transit", Arrays.asList("Boat", "Minecart", "PoweredMinecart", "StorageMinecart"));
 
 		//Projectiles
 		cfg.setProperty("alias.arrow", Arrays.asList("Arrow"));
+		cfg.setProperty("alias.arrows", Arrays.asList("Arrow"));
 		cfg.setProperty("alias.egg", Arrays.asList("Egg"));
+		cfg.setProperty("alias.eggs", Arrays.asList("Egg"));
 		cfg.setProperty("alias.fireball", Arrays.asList("Fireball"));
+		cfg.setProperty("alias.fireballs", Arrays.asList("Fireball"));
 		cfg.setProperty("alias.snowball", Arrays.asList("Snowball"));
+		cfg.setProperty("alias.snowballs", Arrays.asList("Snowball"));
 		cfg.setProperty("alias.projectile", Arrays.asList("Arrow", "Egg", "Fireball", "Snowball"));
 
 		//Explosives
 		cfg.setProperty("alias.lightning", Arrays.asList("LightningStrike"));
 		cfg.setProperty("alias.lightningstrike", Arrays.asList("LightningStrike"));
+		cfg.setProperty("alias.lightningstrikes", Arrays.asList("LightningStrike"));
 		cfg.setProperty("alias.strike", Arrays.asList("LightningStrike"));
+		cfg.setProperty("alias.strikes", Arrays.asList("LightningStrike"));
 		cfg.setProperty("alias.primedtnt", Arrays.asList("PrimedTNT"));
 		cfg.setProperty("alias.tnt", Arrays.asList("TNTPrimed"));
 		cfg.setProperty("alias.weather", Arrays.asList("Weather"));
@@ -202,14 +266,20 @@ public class Spawn extends JavaPlugin {
 		//Drops
 		cfg.setProperty("alias.experience", Arrays.asList("ExperienceOrb"));
 		cfg.setProperty("alias.experienceorb", Arrays.asList("ExperienceOrb"));
+		cfg.setProperty("alias.experienceorbs", Arrays.asList("ExperienceOrb"));
 		cfg.setProperty("alias.orb", Arrays.asList("ExperienceOrb"));
+		cfg.setProperty("alias.orbs", Arrays.asList("ExperienceOrb"));
 		cfg.setProperty("alias.xp", Arrays.asList("ExperienceOrb"));
 		cfg.setProperty("alias.xporb", Arrays.asList("ExperienceOrb"));
+		cfg.setProperty("alias.xporbs", Arrays.asList("ExperienceOrb"));
 		cfg.setProperty("alias.item", Arrays.asList("Item"));
+		cfg.setProperty("alias.items", Arrays.asList("Item"));
 		cfg.setProperty("alias.mirage", Arrays.asList("Item"));
 		cfg.setProperty("alias.mirage-parameters", "/i:264,0");
+		cfg.setProperty("alias.firework", Arrays.asList("Item"));
+		cfg.setProperty("alias.firework-parameters", "/i:51,0/f:60/v:2");
 		cfg.setProperty("alias.fireworks", Arrays.asList("Item"));
-		cfg.setProperty("alias.fireworks-parameters", "/i:331,0/f:60/v:2");
+		cfg.setProperty("alias.fireworks-parameters", "/i:51,0/f:60/v:2");
 		
 		
 
@@ -1205,8 +1275,6 @@ public class Spawn extends JavaPlugin {
 				Spawn.permissions = ((Permissions)test).getHandler();
 				info("Permission system found, plugin enabled");
 			} else {
-				info("Permission system not detected! Please go into the SpawnMob.properties and set use-permissions to false.");
-				info("Please go into the SpawnMob.properties and set use-permissions to false.");
 				usePermissions = false;
 			}
 		}

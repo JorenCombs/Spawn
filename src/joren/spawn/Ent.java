@@ -7,7 +7,6 @@ import org.bukkit.DyeColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.entity.AnimalTamer;
-import org.bukkit.entity.Cow;
 import org.bukkit.entity.CreatureType;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ExperienceOrb;
@@ -195,16 +194,14 @@ public class Ent {
 		Class<Entity> type = pick();
 		try 
 		{
-			Entity ent;
+			Entity ent = null;
 
 			loc.setPitch(-((float)(Math.random() * (double)180)));
 			loc.setYaw((float)(Math.random() * (double)360));
 						
 			//spawn(...) just checks it against a list of pre-approved classes and rejects it if not in there.  Giants fail this test.
 			//spawnCreature seems to be more lenient, as long as it's a LivingEntity.
-			if (LivingEntity.class.isAssignableFrom(type))
-				ent = p.getWorld().spawnCreature(loc, CreatureType.fromName(type.getSimpleName()));
-			else if (Item.class.isAssignableFrom(type))
+			if (Item.class.isAssignableFrom(type))
 			{
 				if (Material.getMaterial(itemType) == null||itemType==0)
 				{
@@ -214,7 +211,13 @@ public class Ent {
 				ent = p.getWorld().dropItem(loc, new ItemStack(itemType, itemAmount, itemDamage, itemData));
 			}
 			else
-				ent = p.getWorld().spawn(loc, type);
+			{
+// Actually, spawnCreature just calls spawn now... hmm...
+//				if (LivingEntity.class.isAssignableFrom(type))
+//					ent = p.getWorld().spawnCreature(loc, CreatureType.fromName(type.getSimpleName()));
+//				if (ent == null)
+				ent = p.getWorld().spawn(loc, type); // also a fall-back for LivingEntities that don't work with spawnCreature
+			}
 			if (ent == null)
 			{
 				Spawn.warning("Some things just weren't meant to be spawned - null entity detected.");
@@ -223,7 +226,6 @@ public class Ent {
 			}
 			ent.teleport(loc);
 
-			
 			//ANGRY
 			
 			if (angry)
