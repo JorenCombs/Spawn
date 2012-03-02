@@ -1,6 +1,9 @@
 never:
     spawn:
     - Animals
+    - AnimalTamer
+    - ComplexEntityPart
+    - ComplexLivingEntity
     - Creature
     - Entity
     - Explosive
@@ -10,13 +13,18 @@ never:
     - HumanEntity
     - LivingEntity
     - Monster
+    - NPC
     - Painting
     - Player
     - Projectile
+    - Tameable
     - Vehicle
     - WaterMob
     kill:
     - Animals
+    - AnimalTamer
+    - ComplexEntityPart
+    - ComplexLivingEntity
     - Creature
     - Entity
     - Explosive
@@ -26,47 +34,33 @@ never:
     - HumanEntity
     - LivingEntity
     - Monster
+    - NPC
     - Painting
     - Player
     - Projectile
+    - Tameable
     - Vehicle
     - WaterMob
-spawn:
-    horizontal-speed-limit: 10.0
-    use-permissions: true
-    spawn-limit: 100
-    size-limit: 50
 alias:
-    lightningstrike:
-    - LightningStrike
     arrow:
     - Arrow
-    pigman:
-    - PigZombie
-    cow:
-    - Cow
-    kill:
-    - CaveSpider
-    - Chicken
-    - Creeper
-    - Cow
-    - Enderman
+    arrows:
+    - Arrow
+    blaze:
+    - Blaze
+    blazes:
+    - Blaze
+    boat:
+    - Boat
+    boats:
+    - Boat
+    boss:
     - Ghast
     - Giant
-    - Pig
-    - PigZombie
-    - Sheep
-    - Silverfish
+    burnable:
+    - Enderman
     - Skeleton
-    - Slime
-    - Spider
-    - Squid
-    - Wolf
     - Zombie
-    xp:
-    - ExperienceOrb
-    minecart:
-    - Minecart
     cave:
     - CaveSpider
     - Creeper
@@ -76,30 +70,149 @@ alias:
     - Slime
     - Spider
     - Zombie
-    storageminecart:
-    - StorageMinecart
+    cart:
+    - Minecart
+    carts:
+    - Minecart
+    cavespider:
+    - CaveSpider
+    cavespiders:
+    - CaveSpider
+    chicken:
+    - Chicken
+    chickens:
+    - Chicken
+    cow:
+    - Cow
+    cows:
+    - Cow
+    creeper:
+    - Creeper
+    creepers:
+    - Creeper
+    day:
+    - Chicken
+    - Cow
+    - Pig
+    - Sheep
+    - Squid
+    dog:
+    - Wolf
+    dogs:
+    - Wolf
+    dragon:
+    - EnderDragon
+    dragons:
+    - EnderDragon
     egg:
     - Egg
-    transit:
-    - Boat
-    - Minecart
+    eggs:
+    - Egg
+    enderdragon:
+    - EnderDragon
+    enderdragons:
+    - EnderDragon
+    enderman:
+    - Enderman
+    endermen:
+    - Enderman
+    engine:
     - PoweredMinecart
-    - StorageMinecart
+    engines:
+    - PoweredMinecart
+    experience:
+    - ExperienceOrb
     experienceorb:
     - ExperienceOrb
-    slime:
+    experienceorbs:
+    - ExperienceOrb
+    explosive:
+    - LightningStrike
+    - PrimedTNT
+    - Weather
+    fireball:
+    - Fireball
+    fireballs:
+    - Fireball
+    firework:
+    - Item
+    firework-parameters: /i:51,0/f:60/v:2
+    fireworks:
+    - Item
+    fireworks-parameters: /i:51,0/f:60/v:2
+    flying:
+    - Ghast
+    friendly:
+    - Chicken
+    - Cow
+    - Pig
+    - Sheep
+    - Squid
+    ghast:
+    - Ghast
+    ghasts:
+    - Ghast
+    giant:
+    - Giant
+    giants:
+    - Giant
+    hostile:
+    - CaveSpider
+    - Creeper
+    - Enderman
+    - Ghast
+    - Giant
+    - Silverfish
+    - Skeleton
     - Slime
+    - Spider
+    - Zombie
+    item:
+    - Item
+    items:
+    - Item
+    kill:
+    - CaveSpider
+    - Creeper
+    - Enderman
+    - Ghast
+    - Giant
+    - PigZombie
+    - Silverfish
+    - Skeleton
+    - Slime
+    - Spider
+    - Squid
+    - Zombie
+    lightning:
+    - LightningStrike
+    lightningstrike:
+    - LightningStrike
+    lightningstrikes:
+    - LightningStrike
+    locomotive:
+    - PoweredMinecart
+    locomotives:
+    - PoweredMinecart
+    magma:
+    - MagmaCube
+    magmacube:
+    - MagmaCube
+    magmacubes:
+    - MagmaCube
+    magmas:
+    - MagmaCube
+    meat:
+    - Pig
+    - Cow
+    - Chicken
+    meat-parameters: /f:60
+    minecart:
+    - Minecart
+    minecarts:
+    - Minecart
     mirage:
     - Item
-    xporb:
-    - ExperienceOrb
-    weather:
-    - Weather
-    train:
-    - Minecart
-    spider:
-    - Spider
-    werewolf-parameters: /a
     mirage-parameters: /i:264,0
     mob:
     - CaveSpider
@@ -117,135 +230,161 @@ alias:
     - Squid
     - Wolf
     - Zombie
-    snowball:
-    - Snowball
-    poweredminecart:
-    - PoweredMinecart
-    cart:
-    - Minecart
-    lightning:
-    - LightningStrike
-    tnt:
-    - TNTPrimed
-    provoke-parameters: /a
-    day:
-    - Chicken
-    - Cow
-    - Pig
-    - Sheep
-    - Squid
-    silverfish:
-    - Silverfish
-    supercreeper-parameters: /a
-    pigzombie:
-    - PigZombie
-    supercreeper:
-    - Creeper
-    explosive:
-    - LightningStrike
-    - PrimedTNT
-    - Weather
-    enderman:
-    - Enderman
-    skeleton:
-    - Skeleton
-    chicken:
-    - Chicken
-    flying:
-    - Ghast
-    primedtnt:
-    - PrimedTNT
-    strike:
-    - LightningStrike
-    zombie:
-    - Zombie
-    zombiepigman:
-    - PigZombie
-    meat:
-    - Pig, Cow, Chicken
-    cavespider:
-    - CaveSpider
-    experience:
-    - ExperienceOrb
-    sheep:
-    - Sheep
-    projectile:
-    - Arrow
-    - Egg
-    - Fireball
-    - Snowball
-    burnable:
-    - Enderman
-    - Skeleton
-    - Zombie
-    boss:
-    - Ghast
-    - Giant
-    friendly:
-    - Chicken
-    - Cow
-    - Pig
-    - Sheep
-    - Squid
-    creeper:
-    - Creeper
-    endermen:
-    - Enderman
-    boat:
-    - Boat
-    fireworks-parameters: /i:331,0/f:60/v:2
-    squid:
-    - Squid
-    pig:
-    - Pig
-    ghast:
-    - Ghast
-    orb:
-    - ExperienceOrb
-    wolf:
-    - Wolf
-    meat-parameters: /f:60
-    locomotive:
-    - PoweredMinecart
-    item:
-    - Item
-    hostile:
-    - CaveSpider
-    - Creeper
-    - Enderman
-    - Ghast
-    - Giant
-    - Silverfish
-    - Skeleton
-    - Slime
-    - Spider
-    - Zombie
-    fireworks:
-    - Item
-    werewolf:
-    - Wolf
+    monster:
+    - Monster
+    monsters:
+    - Monster
+    mooshroom:
+    - MushroomCow
+    mooshroomcow:
+    - MushroomCow
+    mooshroomcows:
+    - MushroomCow
+    mooshrooms:
+    - MushroomCow
+    mushroomcow:
+    - MushroomCow
+    mushroomcows:
+    - MushroomCow
     night:
     - Creeper
     - Enderman
     - Skeleton
     - Spider
     - Zombie
-    dog:
-    - Wolf
+    npc:
+    - Villager
+    npcs:
+    - Villager
+    netherslime:
+    - MagmaCube
+    netherslimes:
+    - MagmaCube
+    orb:
+    - ExperienceOrb
+    orbs:
+    - ExperienceOrb
+    pig:
+    - Pig
+    pigman:
+    - PigZombie
+    pigmen:
+    - PigZombie
+    pigs:
+    - Pig
+    pigzombie:
+    - PigZombie
+    pigzombies:
+    - PigZombie
+    poweredminecart:
+    - PoweredMinecart
+    poweredminecarts:
+    - PoweredMinecart
+    primedtnt:
+    - PrimedTNT
+    projectile:
+    - Arrow
+    - Egg
+    - Fireball
+    - Snowball
     provoke:
     - Enderman
     - PigZombie
     - Wolf
-    fireball:
-    - Fireball
-    giant:
-    - Giant
+    provoke-parameters: /a
+    sheep:
+    - Sheep
+    silverfish:
+    - Silverfish
+    skeleton:
+    - Skeleton
+    skeletons:
+    - Skeleton
+    slime:
+    - Slime
+    slimes:
+    - Slime
+    snowball:
+    - Snowball
+    snowballs:
+    - Snowball
+    snowman:
+    - Snowman
+    snowmen:
+    - Snowman
+    spider:
+    - Spider
+    spiders:
+    - Spider
+    squid:
+    - Squid
+    squids:
+    - Squid
+    storageminecart:
+    - StorageMinecart
+    storageminecarts:
+    - StorageMinecart
+    strike:
+    - LightningStrike
+    strikes:
+    - LightningStrike
+    supercreeper:
+    - Creeper
+    supercreeper-parameters: /a
+    supercreepers:
+    - Creeper
+    supercreepers-parameters: /a
+    tnt:
+    - TNTPrimed
+    train:
+    - Minecart
+    trains:
+    - Minecart
+    transit:
+    - Boat
+    - Minecart
+    - PoweredMinecart
+    - StorageMinecart
+    testificate:
+    - Villager
+    testificates:
+    - Villager
+    villager:
+    - Villager
+    villagers:
+    - Villager
+    weather:
+    - Weather
+    werewolf:
+    - Wolf
+    werewolf-parameters: /a
+    werewolves:
+    - Wolf
+    werewolves-parameters: /a
+    wolf:
+    - Wolf
+    wolves:
+    - Wolf
+    xp:
+    - ExperienceOrb
+    xporb:
+    - ExperienceOrb
+    xporbs:
+    - ExperienceOrb
+    zombiepigman:
+    - PigZombie
+    zombiepigmen:
+    - PigZombie
+    zombie:
+    - Zombie
+    zombies:
+    - Zombie
 player-alias:
     example:
     - JohnDoe
     - JohnDoesBrother
 settings:
     horizontal-speed-limit: 10.0
+    size-limit: 50
+    spawn-limit: 100
     use-permissions: false
-    spawn-limit: 300
-    size-limit: 100
