@@ -1601,7 +1601,7 @@ public class Spawn extends JavaPlugin {
 	 */
 	protected static void warning(String message)
 	{
-		log.warning(message);
+		log.warning(header + message);
 	}
 
 	/**
