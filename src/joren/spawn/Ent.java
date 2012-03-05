@@ -292,15 +292,11 @@ public class Ent {
 				{
 					if (healthIsPercentage)
 					{
-						Spawn.info(String.valueOf(((ExperienceOrb)ent).getExperience()));
 						((ExperienceOrb)ent).setExperience((int)((((double)healthValue)/100)* ((double)((ExperienceOrb)ent).getExperience())));
-						Spawn.info(String.valueOf(((ExperienceOrb)ent).getExperience()));
 					}
 					else
 					{
-						Spawn.info(String.valueOf(((ExperienceOrb)ent).getExperience()));
 						((ExperienceOrb)ent).setExperience(healthValue);
-						Spawn.info(String.valueOf(((ExperienceOrb)ent).getExperience()));
 					}
 				}
 				else 

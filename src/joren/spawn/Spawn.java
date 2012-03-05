@@ -129,6 +129,7 @@ public class Spawn extends JavaPlugin {
 	 */
 	public boolean saveDefault()
 	{
+		cfg = new YamlConfiguration();
 		info("Resetting configuration file with default values...");
 		InputStream stream = getResource("Spawn.yml");
 		if (stream != null)

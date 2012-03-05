@@ -1,3 +1,7 @@
+v0.2.5 - 2011-02-01
+- New configuration system to support R6
+- Prettier default yml file.
+
 v0.2.4 - 2011-02-01
 - Spawning always uses spawn method directly; apparently Bukkit now has spawnCreature calling spawn, but occasionally throws an NPE when it tries to call it.
 - Fixes snowmen, giants, possibly others not spawning due to above issue
