@@ -28,9 +28,6 @@ import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
 
-import com.nijiko.permissions.PermissionHandler;
-import com.nijikokun.bukkit.Permissions.Permissions;
-
 /**
  * Spawn
  * @version 0.1
@@ -43,8 +40,6 @@ import com.nijikokun.bukkit.Permissions.Permissions;
 @SuppressWarnings("deprecation")
 public class Spawn extends JavaPlugin {
 	public static java.util.logging.Logger log = java.util.logging.Logger.getLogger("Minecraft");
-	/** Handle to access the Permissions plugin */
-	public static PermissionHandler permissions;
 	/** Name of the plugin, used in output messages */
 	protected static String name = "Spawn";
 	/** Path where the plugin's saved information is located */
@@ -57,8 +52,6 @@ public class Spawn extends JavaPlugin {
 	protected static List<String> neverSpawn = new ArrayList<String>();
 	protected static List<String> neverKill = new ArrayList<String>();
 	protected static FileConfiguration cfg = null;
-	/** True if this plugin is to be used with Permissions, false if not */
-	protected boolean usePermissions = false;
 	/** Limitations on how many entities can be spawned and what the maximum size of a spawned entity should be */
 	protected int spawnLimit, sizeLimit;
 	protected double hSpeedLimit;
@@ -112,11 +105,8 @@ public class Spawn extends JavaPlugin {
 			sizeLimit = cfg.getInt("settings.size-limit", 100);
 			spawnLimit = cfg.getInt("settings.spawn-limit", 300);
 			hSpeedLimit = cfg.getDouble("settings.horizontal-speed-limit", 10);
-			usePermissions = cfg.getBoolean("settings.use-permissions", true);
 			neverSpawn = cfg.getStringList("never.spawn");
 			neverKill = cfg.getStringList("never.kill");
-			if (usePermissions)
-				setupPermissions();
 		}
 		info("done.");
 		return true;
@@ -1110,25 +1100,6 @@ public class Spawn extends JavaPlugin {
 	}
 
 	/**
-	 * Probably the only leftover from SpawnMob.  Should replace with a PluginListener...
-	 * 
-	 * Tests to see if permissions is working; if so, sets our Permissions handle so we can access it.
-	 * Otherwise, sets permissions to false.
-	 */
-	private void setupPermissions()
-	{
-		Plugin test = this.getServer().getPluginManager().getPlugin("Permissions");
-		if (Spawn.permissions == null) {
-			if (test != null) {
-				Spawn.permissions = ((Permissions)test).getHandler();
-				info("Permission system found, plugin enabled");
-			} else {
-				usePermissions = false;
-			}
-		}
-	}
-	
-	/**
 	 * Checks to see if sender has permission OR is an op.  If not using permissions, only op is tested.
 	 * @param sender: The person whose permission is being checked
  	 * @param permission The permission being checked (e.g. "exampleplugin.examplepermnode")
@@ -1136,11 +1107,7 @@ public class Spawn extends JavaPlugin {
 	 */
 	boolean allowedTo(CommandSender sender, String permission)
 	{
-		if (sender.isOp())
-			return true;
-		else if (usePermissions && sender instanceof Player)
-			return permissions.has((Player)sender, permission);
-		return false;
+		return sender.isOp() || sender.hasPermission(permission);
 	}
 	
 	/**
