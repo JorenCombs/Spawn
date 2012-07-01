@@ -17,7 +17,6 @@ import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ExperienceOrb;
@@ -75,7 +74,7 @@ public class Spawn extends JavaPlugin {
 	 * Saves plugin configuration to disk so that the plugin can be safely disabled.
 	 */
 	public void onDisable() {
-		save();
+		saveConfig();
 		log.info("Disabled.");
 	}
 
@@ -83,96 +82,20 @@ public class Spawn extends JavaPlugin {
 	 * Reloads the plugin by re-reading the configuration file and setting associated variables
 	 * 
 	 * The configuration will be replaced with whatever information is in the file.  Any variables that need to be read from the configuration will be initialized.
-	 * 
-	 * @return boolean: True if reload was successful.  Currently all reloads are considered successful
-	 * since there are fallbacks for cases where the configuration isn't there.
 	 */
-	public boolean reload()
+	public void reload()
 	{
 		info("(re)loading...");
-		File file = new File(config);
-		if(!file.exists())
-		{
-			warning("Could not find a configuration file, saving a new one...");
-			if (!saveDefault())
-			{
-				warning("Running on default values, but could not save a new configuration file.");
-			}
-		}
-		else
-		{
-			cfg = YamlConfiguration.loadConfiguration(file);
-			sizeLimit = cfg.getInt("settings.size-limit", 100);
-			spawnLimit = cfg.getInt("settings.spawn-limit", 300);
-			hSpeedLimit = cfg.getDouble("settings.horizontal-speed-limit", 10);
-			neverSpawn = cfg.getStringList("never.spawn");
-			neverKill = cfg.getStringList("never.kill");
-		}
+		cfg = this.getConfig();
+		this.reloadConfig();
+		sizeLimit = cfg.getInt("settings.size-limit", 100);
+		spawnLimit = cfg.getInt("settings.spawn-limit", 300);
+		hSpeedLimit = cfg.getDouble("settings.horizontal-speed-limit", 10);
+		neverSpawn = cfg.getStringList("never.spawn");
+		neverKill = cfg.getStringList("never.kill");
 		info("done.");
-		return true;
 	}
 
-	/**
-	 * Saves a new default configuration file, overwriting old configuration and file in the process
-	 * Any existing configuration will be replaced with the default configuration and saved to disk.  Any variables that need to be read from the configuration will be initialized
-	 * @return boolean: True if successful, false otherwise
-	 */
-	public boolean saveDefault()
-	{
-		cfg = new YamlConfiguration();
-		info("Resetting configuration file with default values...");
-		InputStream stream = getResource("Spawn.yml");
-		if (stream != null)
-		{
-			cfg.setDefaults(YamlConfiguration.loadConfiguration(stream));
-			cfg.options().copyDefaults(true);
-		}
-		else
-		{
-			severe("Did you delete the configuration yml from your jar file?  That was a really.  bad.  idea.  Go get yourself a new jar.");
-			return false;
-		}
-
-		if (save())
-		{
-			reload();
-			return true;
-		}
-		else
-			return false;
-	}
-	
-	/**
-	 * Saves the configuration file, overwriting old file in the process
-	 * 
-	 * @return boolean: True if successful, false otherwise.
-	 */
-	public boolean save()
-	{
-		info("Saving configuration file...");
-		File dir = new File(path);
-		if(!dir.exists())
-		{
-			if (!dir.mkdir())
-			{
-				severe("Could not create directory " + path + "; if there is a file with this name, please rename it to something else.  Please make sure the server has rights to make this directory.");
-				return false;
-			}
-			info("Created directory " + path + "; this is where your configuration file will be kept.");
-		}
-		File file = new File(config);
-		try
-		{
-			cfg.save(file);
-		} catch (IOException e)
-		{
-			severe("Configuration could not be saved correctly(" + e.getLocalizedMessage() + ")! Please make sure the server has rights to output to " + config);
-			return false;
-		}
-		info("Saved configuration file: " + config);
-		return true;
-	}
-	
 	/**
 	 * Sets a flag intended to prevent this entity from ever being spawned by this plugin
 	 * 
@@ -950,28 +873,23 @@ public class Spawn extends JavaPlugin {
 					if (args[0].equalsIgnoreCase("save"))
 					{
 						sender.sendMessage(ChatColor.GREEN + "Saving configuration file...");
-						if (save())
-							sender.sendMessage(ChatColor.GREEN + "Done.");
-						else
-							sender.sendMessage(ChatColor.RED + "Could not save configuration file - please see server log.");
+						this.saveConfig();
+						sender.sendMessage(ChatColor.GREEN + "Done.");
 						return true;
 					}
 					else if (args[0].equalsIgnoreCase("reset"))
 					{
 						sender.sendMessage(ChatColor.GREEN + "Resetting configuration file...");
-						if (saveDefault())
-							sender.sendMessage(ChatColor.GREEN + "Done.");
-						else
-							sender.sendMessage(ChatColor.RED + "Could not save configuration file - please see server log.");
+						this.saveDefaultConfig();
+						this.reload();
+						sender.sendMessage(ChatColor.GREEN + "Done.");
 						return true;
 					}
 					else if (args[0].equalsIgnoreCase("reload"))
 					{
 						sender.sendMessage(ChatColor.GREEN + "Reloading Spawn...");
-						if (reload())
-							sender.sendMessage(ChatColor.GREEN + "Done.");
-						else
-							sender.sendMessage(ChatColor.RED + "An error occurred while reloading - please see server log.");
+						this.reload();
+						sender.sendMessage(ChatColor.GREEN + "Done.");
 						return true;
 					}
 				}
