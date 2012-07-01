@@ -17,7 +17,6 @@ import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.AnimalTamer;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.ExperienceOrb;
@@ -27,9 +26,6 @@ import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
-
-import com.nijiko.permissions.PermissionHandler;
-import com.nijikokun.bukkit.Permissions.Permissions;
 
 /**
  * Spawn
@@ -42,23 +38,11 @@ import com.nijikokun.bukkit.Permissions.Permissions;
  */
 @SuppressWarnings("deprecation")
 public class Spawn extends JavaPlugin {
-	public static java.util.logging.Logger log = java.util.logging.Logger.getLogger("Minecraft");
-	/** Handle to access the Permissions plugin */
-	public static PermissionHandler permissions;
-	/** Name of the plugin, used in output messages */
-	protected static String name = "Spawn";
-	/** Path where the plugin's saved information is located */
-	protected static String path = "plugins" + File.separator + name;
-	/** Location of the config YML file */
-	protected static String config = path + File.separator + name + ".yml";
-	/** Header used for console and player output messages */
-	protected static String header = "[" + name + "] ";
+	public static java.util.logging.Logger log;
 	/** Represents the plugin's YML configuration */
 	protected static List<String> neverSpawn = new ArrayList<String>();
 	protected static List<String> neverKill = new ArrayList<String>();
 	protected static FileConfiguration cfg = null;
-	/** True if this plugin is to be used with Permissions, false if not */
-	protected boolean usePermissions = false;
 	/** Limitations on how many entities can be spawned and what the maximum size of a spawned entity should be */
 	protected int spawnLimit, sizeLimit;
 	protected double hSpeedLimit;
@@ -69,20 +53,16 @@ public class Spawn extends JavaPlugin {
 	 */
 	public void onEnable()
 	{
-		PluginDescriptionFile pdfFile = this.getDescription();
-		name = pdfFile.getName();
-		header = "[" + name + "] ";
-		path = "plugins" + File.separator + name;
-		config = path + File.separator + name + ".yml";
+		log = getLogger();
 		reload();
-		info("Version " + pdfFile.getVersion() + " enabled.");
+		log.info("Version " + this.getDescription().getVersion() + " enabled.");
 	}
 	
 	/**
 	 * Saves plugin configuration to disk so that the plugin can be safely disabled.
 	 */
 	public void onDisable() {
-		save();
+		saveConfig();
 		log.info("Disabled.");
 	}
 
@@ -90,99 +70,19 @@ public class Spawn extends JavaPlugin {
 	 * Reloads the plugin by re-reading the configuration file and setting associated variables
 	 * 
 	 * The configuration will be replaced with whatever information is in the file.  Any variables that need to be read from the configuration will be initialized.
-	 * 
-	 * @return boolean: True if reload was successful.  Currently all reloads are considered successful
-	 * since there are fallbacks for cases where the configuration isn't there.
 	 */
-	public boolean reload()
+	public void reload()
 	{
-		info("(re)loading...");
-		File file = new File(config);
-		if(!file.exists())
-		{
-			warning("Could not find a configuration file, saving a new one...");
-			if (!saveDefault())
-			{
-				warning("Running on default values, but could not save a new configuration file.");
-			}
-		}
-		else
-		{
-			cfg = YamlConfiguration.loadConfiguration(file);
-			sizeLimit = cfg.getInt("settings.size-limit", 100);
-			spawnLimit = cfg.getInt("settings.spawn-limit", 300);
-			hSpeedLimit = cfg.getDouble("settings.horizontal-speed-limit", 10);
-			usePermissions = cfg.getBoolean("settings.use-permissions", true);
-			neverSpawn = cfg.getStringList("never.spawn");
-			neverKill = cfg.getStringList("never.kill");
-			if (usePermissions)
-				setupPermissions();
-		}
-		info("done.");
-		return true;
+		cfg = this.getConfig();
+		this.reloadConfig();
+		sizeLimit = cfg.getInt("settings.size-limit", 100);
+		spawnLimit = cfg.getInt("settings.spawn-limit", 300);
+		hSpeedLimit = cfg.getDouble("settings.horizontal-speed-limit", 10);
+		neverSpawn = cfg.getStringList("never.spawn");
+		neverKill = cfg.getStringList("never.kill");
+		log.info("(re)load done.");
 	}
 
-	/**
-	 * Saves a new default configuration file, overwriting old configuration and file in the process
-	 * Any existing configuration will be replaced with the default configuration and saved to disk.  Any variables that need to be read from the configuration will be initialized
-	 * @return boolean: True if successful, false otherwise
-	 */
-	public boolean saveDefault()
-	{
-		cfg = new YamlConfiguration();
-		info("Resetting configuration file with default values...");
-		InputStream stream = getResource("Spawn.yml");
-		if (stream != null)
-		{
-			cfg.setDefaults(YamlConfiguration.loadConfiguration(stream));
-			cfg.options().copyDefaults(true);
-		}
-		else
-		{
-			severe("Did you delete the configuration yml from your jar file?  That was a really.  bad.  idea.  Go get yourself a new jar.");
-			return false;
-		}
-
-		if (save())
-		{
-			reload();
-			return true;
-		}
-		else
-			return false;
-	}
-	
-	/**
-	 * Saves the configuration file, overwriting old file in the process
-	 * 
-	 * @return boolean: True if successful, false otherwise.
-	 */
-	public boolean save()
-	{
-		info("Saving configuration file...");
-		File dir = new File(path);
-		if(!dir.exists())
-		{
-			if (!dir.mkdir())
-			{
-				severe("Could not create directory " + path + "; if there is a file with this name, please rename it to something else.  Please make sure the server has rights to make this directory.");
-				return false;
-			}
-			info("Created directory " + path + "; this is where your configuration file will be kept.");
-		}
-		File file = new File(config);
-		try
-		{
-			cfg.save(file);
-		} catch (IOException e)
-		{
-			severe("Configuration could not be saved correctly(" + e.getLocalizedMessage() + ")! Please make sure the server has rights to output to " + config);
-			return false;
-		}
-		info("Saved configuration file: " + config);
-		return true;
-	}
-	
 	/**
 	 * Sets a flag intended to prevent this entity from ever being spawned by this plugin
 	 * 
@@ -296,7 +196,7 @@ public class Spawn extends JavaPlugin {
 				}
 				catch (ClassNotFoundException e)
 				{
-					warning("Config file says that " + alias + " is a " + entName + ", but could not find that class.  Skipping...");
+					log.warning("Config file says that " + alias + " is a " + entName + ", but could not find that class.  Skipping...");
 				}
 			}
 		else
@@ -310,7 +210,7 @@ public class Spawn extends JavaPlugin {
 					{
 						list.add((Class<Entity>) c);
 						cfg.set("alias." + alias.toLowerCase(), Arrays.asList(c.getSimpleName()));
-						info("Class " + c.getName() + " has not been invoked before; adding alias to configuration");
+						log.info("Class " + c.getName() + " has not been invoked before; adding alias to configuration");
 					}
 				}
 			}
@@ -934,7 +834,7 @@ public class Spawn extends JavaPlugin {
 						}
 						if (count > (spawnLimit/passengerList.length))
 						{
-							info("Player " + sender.getName() + " tried to spawn more than " + spawnLimit + " entities.");
+							log.info("Player " + sender.getName() + " tried to spawn more than " + spawnLimit + " entities.");
 							count = spawnLimit/passengerList.length;
 						}
 						if (index.spawn(player, this, loc, count))
@@ -960,28 +860,23 @@ public class Spawn extends JavaPlugin {
 					if (args[0].equalsIgnoreCase("save"))
 					{
 						sender.sendMessage(ChatColor.GREEN + "Saving configuration file...");
-						if (save())
-							sender.sendMessage(ChatColor.GREEN + "Done.");
-						else
-							sender.sendMessage(ChatColor.RED + "Could not save configuration file - please see server log.");
+						this.saveConfig();
+						sender.sendMessage(ChatColor.GREEN + "Done.");
 						return true;
 					}
 					else if (args[0].equalsIgnoreCase("reset"))
 					{
 						sender.sendMessage(ChatColor.GREEN + "Resetting configuration file...");
-						if (saveDefault())
-							sender.sendMessage(ChatColor.GREEN + "Done.");
-						else
-							sender.sendMessage(ChatColor.RED + "Could not save configuration file - please see server log.");
+						this.saveDefaultConfig();
+						this.reload();
+						sender.sendMessage(ChatColor.GREEN + "Done.");
 						return true;
 					}
 					else if (args[0].equalsIgnoreCase("reload"))
 					{
 						sender.sendMessage(ChatColor.GREEN + "Reloading Spawn...");
-						if (reload())
-							sender.sendMessage(ChatColor.GREEN + "Done.");
-						else
-							sender.sendMessage(ChatColor.RED + "An error occurred while reloading - please see server log.");
+						this.reload();
+						sender.sendMessage(ChatColor.GREEN + "Done.");
 						return true;
 					}
 				}
@@ -1110,25 +1005,6 @@ public class Spawn extends JavaPlugin {
 	}
 
 	/**
-	 * Probably the only leftover from SpawnMob.  Should replace with a PluginListener...
-	 * 
-	 * Tests to see if permissions is working; if so, sets our Permissions handle so we can access it.
-	 * Otherwise, sets permissions to false.
-	 */
-	private void setupPermissions()
-	{
-		Plugin test = this.getServer().getPluginManager().getPlugin("Permissions");
-		if (Spawn.permissions == null) {
-			if (test != null) {
-				Spawn.permissions = ((Permissions)test).getHandler();
-				info("Permission system found, plugin enabled");
-			} else {
-				usePermissions = false;
-			}
-		}
-	}
-	
-	/**
 	 * Checks to see if sender has permission OR is an op.  If not using permissions, only op is tested.
 	 * @param sender: The person whose permission is being checked
  	 * @param permission The permission being checked (e.g. "exampleplugin.examplepermnode")
@@ -1136,11 +1012,7 @@ public class Spawn extends JavaPlugin {
 	 */
 	boolean allowedTo(CommandSender sender, String permission)
 	{
-		if (sender.isOp())
-			return true;
-		else if (usePermissions && sender instanceof Player)
-			return permissions.has((Player)sender, permission);
-		return false;
+		return sender.isOp() || sender.hasPermission(permission);
 	}
 	
 	/**
@@ -1256,7 +1128,7 @@ public class Spawn extends JavaPlugin {
 				{
 					if (ent instanceof ExperienceOrb)
 					{
-						info(String.valueOf(((ExperienceOrb)ent).getExperience()));
+						log.info(String.valueOf(((ExperienceOrb)ent).getExperience()));
 						if (((ExperienceOrb)ent).getExperience()!=healthValue)
 							return false;
 					}
@@ -1357,11 +1229,11 @@ public class Spawn extends JavaPlugin {
 			}
 		} catch(InvocationTargetException e)
 		{
-			warning("Target " + type.getSimpleName() + " has a method for doing something, but threw an exception when it was invoked:");
+			log.warning("Target " + type.getSimpleName() + " has a method for doing something, but threw an exception when it was invoked:");
 			e.printStackTrace();
 		} catch(IllegalAccessException e)
 		{
-			warning("Target " + type.getSimpleName() + " has a method for doing something, but threw an exception when it was invoked:");
+			log.warning("Target " + type.getSimpleName() + " has a method for doing something, but threw an exception when it was invoked:");
 			e.printStackTrace();
 		} 
 		return false;
@@ -1421,44 +1293,5 @@ public class Spawn extends JavaPlugin {
 			}
 		}
 		return bodycount;
-	}
-	
-	/**
-	 * Logs an informative message to the console, prefaced with this plugin's header
-	 * @param message: String
-	 */
-	protected static void info(String message)
-	{
-		log.info(header + message);
-	}
-
-	/**
-	 * Logs a severe error message to the console, prefaced with this plugin's header
-	 * Used to log severe problems that have prevented normal execution of the plugin
-	 * @param message: String
-	 */
-	protected static void severe(String message)
-	{
-		log.severe(header + message);
-	}
-
-	/**
-	 * Logs a warning message to the console, prefaced with this plugin's header
-	 * Used to log problems that could interfere with the plugin's ability to meet admin expectations
-	 * @param message: String
-	 */
-	protected static void warning(String message)
-	{
-		log.warning(header + message);
-	}
-
-	/**
-	 * Logs a message to the console, prefaced with this plugin's header
-	 * @param level: Logging level under which to send the message
-	 * @param message: String
-	 */
-	protected static void log(java.util.logging.Level level, String message)
-	{
-		log.log(level, header + message);
 	}
 }

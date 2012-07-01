@@ -387,4 +387,3 @@ settings:
     horizontal-speed-limit: 10.0
     size-limit: 50
     spawn-limit: 100
-    use-permissions: false
