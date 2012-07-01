@@ -38,15 +38,7 @@ import org.bukkit.util.Vector;
  */
 @SuppressWarnings("deprecation")
 public class Spawn extends JavaPlugin {
-	public static java.util.logging.Logger log = java.util.logging.Logger.getLogger("Minecraft");
-	/** Name of the plugin, used in output messages */
-	protected static String name = "Spawn";
-	/** Path where the plugin's saved information is located */
-	protected static String path = "plugins" + File.separator + name;
-	/** Location of the config YML file */
-	protected static String config = path + File.separator + name + ".yml";
-	/** Header used for console and player output messages */
-	protected static String header = "[" + name + "] ";
+	public static java.util.logging.Logger log;
 	/** Represents the plugin's YML configuration */
 	protected static List<String> neverSpawn = new ArrayList<String>();
 	protected static List<String> neverKill = new ArrayList<String>();
@@ -61,13 +53,9 @@ public class Spawn extends JavaPlugin {
 	 */
 	public void onEnable()
 	{
-		PluginDescriptionFile pdfFile = this.getDescription();
-		name = pdfFile.getName();
-		header = "[" + name + "] ";
-		path = "plugins" + File.separator + name;
-		config = path + File.separator + name + ".yml";
+		log = getLogger();
 		reload();
-		info("Version " + pdfFile.getVersion() + " enabled.");
+		log.info("Version " + this.getDescription().getVersion() + " enabled.");
 	}
 	
 	/**
@@ -85,7 +73,6 @@ public class Spawn extends JavaPlugin {
 	 */
 	public void reload()
 	{
-		info("(re)loading...");
 		cfg = this.getConfig();
 		this.reloadConfig();
 		sizeLimit = cfg.getInt("settings.size-limit", 100);
@@ -93,7 +80,7 @@ public class Spawn extends JavaPlugin {
 		hSpeedLimit = cfg.getDouble("settings.horizontal-speed-limit", 10);
 		neverSpawn = cfg.getStringList("never.spawn");
 		neverKill = cfg.getStringList("never.kill");
-		info("done.");
+		log.info("(re)load done.");
 	}
 
 	/**
@@ -209,7 +196,7 @@ public class Spawn extends JavaPlugin {
 				}
 				catch (ClassNotFoundException e)
 				{
-					warning("Config file says that " + alias + " is a " + entName + ", but could not find that class.  Skipping...");
+					log.warning("Config file says that " + alias + " is a " + entName + ", but could not find that class.  Skipping...");
 				}
 			}
 		else
@@ -223,7 +210,7 @@ public class Spawn extends JavaPlugin {
 					{
 						list.add((Class<Entity>) c);
 						cfg.set("alias." + alias.toLowerCase(), Arrays.asList(c.getSimpleName()));
-						info("Class " + c.getName() + " has not been invoked before; adding alias to configuration");
+						log.info("Class " + c.getName() + " has not been invoked before; adding alias to configuration");
 					}
 				}
 			}
@@ -847,7 +834,7 @@ public class Spawn extends JavaPlugin {
 						}
 						if (count > (spawnLimit/passengerList.length))
 						{
-							info("Player " + sender.getName() + " tried to spawn more than " + spawnLimit + " entities.");
+							log.info("Player " + sender.getName() + " tried to spawn more than " + spawnLimit + " entities.");
 							count = spawnLimit/passengerList.length;
 						}
 						if (index.spawn(player, this, loc, count))
@@ -1141,7 +1128,7 @@ public class Spawn extends JavaPlugin {
 				{
 					if (ent instanceof ExperienceOrb)
 					{
-						info(String.valueOf(((ExperienceOrb)ent).getExperience()));
+						log.info(String.valueOf(((ExperienceOrb)ent).getExperience()));
 						if (((ExperienceOrb)ent).getExperience()!=healthValue)
 							return false;
 					}
@@ -1242,11 +1229,11 @@ public class Spawn extends JavaPlugin {
 			}
 		} catch(InvocationTargetException e)
 		{
-			warning("Target " + type.getSimpleName() + " has a method for doing something, but threw an exception when it was invoked:");
+			log.warning("Target " + type.getSimpleName() + " has a method for doing something, but threw an exception when it was invoked:");
 			e.printStackTrace();
 		} catch(IllegalAccessException e)
 		{
-			warning("Target " + type.getSimpleName() + " has a method for doing something, but threw an exception when it was invoked:");
+			log.warning("Target " + type.getSimpleName() + " has a method for doing something, but threw an exception when it was invoked:");
 			e.printStackTrace();
 		} 
 		return false;
@@ -1306,44 +1293,5 @@ public class Spawn extends JavaPlugin {
 			}
 		}
 		return bodycount;
-	}
-	
-	/**
-	 * Logs an informative message to the console, prefaced with this plugin's header
-	 * @param message: String
-	 */
-	protected static void info(String message)
-	{
-		log.info(header + message);
-	}
-
-	/**
-	 * Logs a severe error message to the console, prefaced with this plugin's header
-	 * Used to log severe problems that have prevented normal execution of the plugin
-	 * @param message: String
-	 */
-	protected static void severe(String message)
-	{
-		log.severe(header + message);
-	}
-
-	/**
-	 * Logs a warning message to the console, prefaced with this plugin's header
-	 * Used to log problems that could interfere with the plugin's ability to meet admin expectations
-	 * @param message: String
-	 */
-	protected static void warning(String message)
-	{
-		log.warning(header + message);
-	}
-
-	/**
-	 * Logs a message to the console, prefaced with this plugin's header
-	 * @param level: Logging level under which to send the message
-	 * @param message: String
-	 */
-	protected static void log(java.util.logging.Level level, String message)
-	{
-		log.log(level, header + message);
 	}
 }
