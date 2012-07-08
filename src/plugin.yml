@@ -1,6 +1,6 @@
 name: Spawn
 main: joren.spawn.Spawn
-version: 0.2.5
+version: 0.2.6
 description: Spawn any entity; do maniacal things with them
 commands:
   ent:

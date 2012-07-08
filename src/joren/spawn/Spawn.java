@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
+
+import net.milkbowl.vault.permission.Permission;
+
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
@@ -25,11 +28,10 @@ import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.PluginDescriptionFile;
+import org.bukkit.plugin.PluginManager;
+import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.Vector;
-
-import com.nijiko.permissions.PermissionHandler;
-import com.nijikokun.bukkit.Permissions.Permissions;
 
 /**
  * Spawn
@@ -44,7 +46,7 @@ import com.nijikokun.bukkit.Permissions.Permissions;
 public class Spawn extends JavaPlugin {
 	public static java.util.logging.Logger log = java.util.logging.Logger.getLogger("Minecraft");
 	/** Handle to access the Permissions plugin */
-	public static PermissionHandler permissions;
+	public static Permission permissions;
 	/** Name of the plugin, used in output messages */
 	protected static String name = "Spawn";
 	/** Path where the plugin's saved information is located */
@@ -62,6 +64,8 @@ public class Spawn extends JavaPlugin {
 	/** Limitations on how many entities can be spawned and what the maximum size of a spawned entity should be */
 	protected int spawnLimit, sizeLimit;
 	protected double hSpeedLimit;
+	
+	private final PluginListener pluginListener = new PluginListener(this);
 
 	/**
 	 * Initializes plugin description variables (in case they are different from when written)
@@ -98,6 +102,8 @@ public class Spawn extends JavaPlugin {
 	{
 		info("(re)loading...");
 		File file = new File(config);
+		PluginManager pm = this.getServer().getPluginManager();
+		pm.registerEvents(pluginListener, this);
 		if(!file.exists())
 		{
 			warning("Could not find a configuration file, saving a new one...");
@@ -115,8 +121,12 @@ public class Spawn extends JavaPlugin {
 			usePermissions = cfg.getBoolean("settings.use-permissions", true);
 			neverSpawn = cfg.getStringList("never.spawn");
 			neverKill = cfg.getStringList("never.kill");
-			if (usePermissions)
-				setupPermissions();
+			if (usePermissions) {
+				RegisteredServiceProvider<Permission> permissionProvider = getServer().getServicesManager().getRegistration(net.milkbowl.vault.permission.Permission.class);
+		        if (permissionProvider != null) {
+		            this.setPermissions(permissionProvider.getProvider());
+		        }
+			}
 		}
 		info("done.");
 		return true;
@@ -1110,22 +1120,12 @@ public class Spawn extends JavaPlugin {
 	}
 
 	/**
-	 * Probably the only leftover from SpawnMob.  Should replace with a PluginListener...
-	 * 
-	 * Tests to see if permissions is working; if so, sets our Permissions handle so we can access it.
-	 * Otherwise, sets permissions to false.
+	 * Sets our {@link #permissions} variable.
+	 * @param permissions - what the variable should be set to.
 	 */
-	private void setupPermissions()
+	protected void setPermissions(Permission permissions)
 	{
-		Plugin test = this.getServer().getPluginManager().getPlugin("Permissions");
-		if (Spawn.permissions == null) {
-			if (test != null) {
-				Spawn.permissions = ((Permissions)test).getHandler();
-				info("Permission system found, plugin enabled");
-			} else {
-				usePermissions = false;
-			}
-		}
+		Spawn.permissions = permissions;
 	}
 	
 	/**
@@ -1134,11 +1134,11 @@ public class Spawn extends JavaPlugin {
  	 * @param permission The permission being checked (e.g. "exampleplugin.examplepermnode")
 	 * @returns boolean: True if player has the permission node OR if player is an op
 	 */
-	boolean allowedTo(CommandSender sender, String permission)
+	protected boolean allowedTo(CommandSender sender, String permission)
 	{
 		if (sender.isOp())
 			return true;
-		else if (usePermissions && sender instanceof Player)
+		else if (usePermissions && Spawn.permissions != null && sender instanceof Player)
 			return permissions.has((Player)sender, permission);
 		return false;
 	}
