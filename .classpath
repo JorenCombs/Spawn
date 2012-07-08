@@ -2,7 +2,8 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="C:/Users/ジョーレン　コームズ/Workspace/Eclipse/lib/Permissions.jar"/>
-	<classpathentry kind="lib" path="C:/Users/ジョーレン　コームズ/Workspace/Eclipse/lib/bukkit-1.2.2-R0.1-20120301.224440-6.jar"/>
+	<classpathentry kind="lib" path="C:/Users/ジョーレン/Workspace/Lib/Vault.jar"/>
+	<classpathentry kind="lib" path="C:/Users/ジョーレン/Workspace/Lib/bukkit-1.2.5-R4.0.jar"/>
+	<classpathentry kind="lib" path="C:/Users/ジョーレン/Workspace/Lib/Permissions.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
