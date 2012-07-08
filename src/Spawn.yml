@@ -5,11 +5,13 @@ never:
     - ComplexEntityPart
     - ComplexLivingEntity
     - Creature
+    - EnderDragonPart
     - Entity
     - Explosive
     - FallingSand
     - Fish
     - Flying
+    - Golem
     - HumanEntity
     - LivingEntity
     - Monster
@@ -18,6 +20,7 @@ never:
     - Player
     - Projectile
     - Tameable
+    - ThrownPotion
     - Vehicle
     - WaterMob
     kill:
@@ -26,11 +29,13 @@ never:
     - ComplexEntityPart
     - ComplexLivingEntity
     - Creature
+    - EnderDragonPart
     - Entity
     - Explosive
     - FallingSand
     - Fish
     - Flying
+    - Golem
     - HumanEntity
     - LivingEntity
     - Monster
@@ -39,6 +44,7 @@ never:
     - Player
     - Projectile
     - Tameable
+    - ThrownPotion
     - Vehicle
     - WaterMob
 alias:
@@ -54,11 +60,14 @@ alias:
     - Boat
     boats:
     - Boat
+    bottle:
+    - ThrownExpBottle
+    bottles:
+    - ThrownExpBottle
     boss:
     - Ghast
     - Giant
     burnable:
-    - Enderman
     - Skeleton
     - Zombie
     cave:
@@ -74,6 +83,10 @@ alias:
     - Minecart
     carts:
     - Minecart
+    cat:
+    - Ocelot
+    cats:
+    - Ocelot
     cavespider:
     - CaveSpider
     cavespiders:
@@ -90,6 +103,10 @@ alias:
     - Creeper
     creepers:
     - Creeper
+    crystal:
+    - EnderCrystal
+    crystals:
+    - EnderCrystal
     day:
     - Chicken
     - Cow
@@ -108,6 +125,10 @@ alias:
     - Egg
     eggs:
     - Egg
+    endercrystal:
+    - EnderCrystal
+    endercrystals:
+    - EnderCrystal
     enderdragon:
     - EnderDragon
     enderdragons:
@@ -116,10 +137,22 @@ alias:
     - Enderman
     endermen:
     - Enderman
+    enderpearl:
+    - EnderPearl
+    enderpearls:
+    - EnderPearl
+    endersignal:
+    - EnderSignal
+    endersignals:
+    - EnderSignal
     engine:
     - PoweredMinecart
     engines:
     - PoweredMinecart
+    expbottle:
+    - ThrownExpBottle
+    expbottles:
+    - ThrownExpBottle
     experience:
     - ExperienceOrb
     experienceorb:
@@ -127,8 +160,10 @@ alias:
     experienceorbs:
     - ExperienceOrb
     explosive:
+    - Fireball
     - LightningStrike
     - PrimedTNT
+    - SmallFireball
     - Weather
     fireball:
     - Fireball
@@ -156,6 +191,10 @@ alias:
     - Giant
     giants:
     - Giant
+    golem:
+    - IronGolem
+    golems:
+    - IronGolem
     hostile:
     - CaveSpider
     - Creeper
@@ -167,6 +206,10 @@ alias:
     - Slime
     - Spider
     - Zombie
+    irongolem:
+    - IronGolem
+    irongolems:
+    - IronGolem
     item:
     - Item
     items:
@@ -260,10 +303,18 @@ alias:
     - MagmaCube
     netherslimes:
     - MagmaCube
+    ocelot:
+    - Ocelot
+    ocelots:
+    - Ocelot
     orb:
     - ExperienceOrb
     orbs:
     - ExperienceOrb
+    pearl:
+    - EnderPearl
+    pearls:
+    - EnderPearl
     pig:
     - Pig
     pigman:
@@ -286,6 +337,7 @@ alias:
     - Arrow
     - Egg
     - Fireball
+    - SmallFireball
     - Snowball
     provoke:
     - Enderman
@@ -296,10 +348,24 @@ alias:
     - Sheep
     silverfish:
     - Silverfish
+    signal:
+    - EnderSignal
+    signals:
+    - EnderSignal
     skeleton:
     - Skeleton
     skeletons:
     - Skeleton
+    smallfireball:
+    - SmallFireball;
+    smallfireballs:
+    - SmallFireball;
+    slave:
+    - IronGolem
+    - Snowman
+    slaves:
+    - IronGolem
+    - Snowman
     slime:
     - Slime
     slimes:
@@ -334,6 +400,10 @@ alias:
     supercreepers:
     - Creeper
     supercreepers-parameters: /a
+    thrownexpbottle:
+    - ThrownExpBottle
+    thrownexpbottles:
+    - ThrownExpBottle
     tnt:
     - TNTPrimed
     train:

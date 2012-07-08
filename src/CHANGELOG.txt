@@ -1,5 +1,8 @@
 v0.2.6 - 2012-07-08
 - Uses Vault for permissions handling
+- Updated Spawn.yml for new mob types ("new" being relative :) )
+- Now supports spawning little entities (/l)
+- Spawns the entity in the middle of the block instead of on the edge (should make it easier to place TNT on singletons ;) )
 
 v0.2.5 - 2011-02-01
 - New configuration system to support R6

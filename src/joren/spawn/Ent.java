@@ -43,7 +43,7 @@ public class Ent {
 	protected short itemDamage=0;
 	protected Byte itemData=null;
 	/** Booleans generally indicating whether specified values should be set (true) or ignored (false) */
-	protected boolean angry=false, bounce=false, color=false, health=false, healthIsPercentage=true, mount=false, naked=false, owned=false, size=false, target=false, velocity=false, youth=false;
+	protected boolean angry=false, bounce=false, color=false, health=false, healthIsPercentage=true, little=false, mount=false, naked=false, owned=false, size=false, target=false, velocity=false, youth=false;
 	/** Used for setting an entity's color (e.g. sheep)*/
 	protected DyeColor colorCode=DyeColor.WHITE;
 	/** Used for dealing with owners and possible targets for entities that support them */
@@ -61,6 +61,7 @@ public class Ent {
 	 * @param health: If true, will set the entity's health using healthValue
 	 * @param healthPercentage: True if healthValue should be taken as a percentage of normal health
 	 * @param healthValue: Used to set the entity's health if the entity supports it
+	 * @param little: True if entity should be little, false if not
 	 * @param mount: If true, will make the entity have a mount (e.g. saddle for pig) if it is supported
 	 * @param owned: If true, the entity will belong to Owner
 	 * @param owner: Used to set the entity's owner if entity supports ownership
@@ -76,7 +77,7 @@ public class Ent {
 	 * @param youth: If true, age will be set to youthValue
 	 * @param youthValue: How young you want the entity
 	 */
-	public Ent(Class<Entity>[] types, String alias, boolean angry, boolean bounce, boolean color, DyeColor colorCode, int fireTicks, boolean health, boolean healthIsPercentage, int healthValue, int itemType, int itemAmount, short itemDamage, Byte itemData, boolean mount, boolean naked, boolean owned, Player[] owner, Ent passenger, boolean size, int sizeValue, boolean target, Player[] targets, boolean velocity, double velRandom, Vector velValue, boolean youth, int youthValue) {
+	public Ent(Class<Entity>[] types, String alias, boolean angry, boolean bounce, boolean color, DyeColor colorCode, int fireTicks, boolean health, boolean healthIsPercentage, int healthValue, int itemType, int itemAmount, short itemDamage, Byte itemData, boolean little, boolean mount, boolean naked, boolean owned, Player[] owner, Ent passenger, boolean size, int sizeValue, boolean target, Player[] targets, boolean velocity, double velRandom, Vector velValue, boolean youth, int youthValue) {
 		this.types=types;
 		this.alias=alias;
 		this.angry=angry;
@@ -92,6 +93,7 @@ public class Ent {
 		this.itemAmount = itemAmount;
 		this.itemDamage = itemDamage;
 		this.itemData = itemData;
+		this.little = little;
 		this.mount=mount;
 		this.naked=naked;
 		this.owned=owned;
@@ -312,6 +314,27 @@ public class Ent {
 					}
 					catch (NoSuchMethodException e){}
 				}
+			}
+			
+			//LITTLE
+			
+			if (little)
+			{
+				Method littleMethod;
+				try
+				{
+					littleMethod = type.getMethod("setBaby");
+					littleMethod.invoke(ent);
+				} catch (NoSuchMethodException e){}
+			}
+			else
+			{
+				Method bigMethod;
+				try
+				{
+					bigMethod = type.getMethod("setAdult");
+					bigMethod.invoke(ent);
+				} catch (NoSuchMethodException e){}
 			}
 
 			//MOUNT

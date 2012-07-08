@@ -33,6 +33,7 @@ public class Person extends Ent {
 	 * @param health: If true, will set the entity's health using healthValue
 	 * @param healthPercentage: True if healthValue should be taken as a percentage of normal health
 	 * @param healthValue: Used to set the entity's health if the entity supports it
+	 * @param little: True if entity should be little, false if not
 	 * @param mount: If true, will make the entity have a mount (e.g. saddle for pig) if it is supported
 	 * @param owned: If true, the entity will belong to Owner
 	 * @param owner: Used to set the entity's owner if entity supports ownership
@@ -47,8 +48,8 @@ public class Person extends Ent {
 	 * @param youth: If true, age will be set to youthValue
 	 * @param youthValue: How young you want the entity
 	 */
-	public Person(Player[] people, String alias, boolean angry, boolean bounce, boolean color, DyeColor colorCode, int fireTicks, boolean health, boolean healthIsPercentage, int healthValue, int itemType, int itemAmount, short itemDamage, Byte itemData, boolean mount, boolean naked, boolean owned, Player[] owner, Ent passenger, boolean size, int sizeValue, boolean target, Player[] targets, boolean velocity, double velRandom, Vector velValue, boolean youth, int youthValue) {
-		super (null, alias, angry, bounce, color, colorCode, fireTicks, health, healthIsPercentage, healthValue, itemType, itemAmount, itemDamage, itemData, mount, naked, owned, owner, passenger, size, sizeValue, target, targets, velocity, velRandom, velValue, youth, youthValue);
+	public Person(Player[] people, String alias, boolean angry, boolean bounce, boolean color, DyeColor colorCode, int fireTicks, boolean health, boolean healthIsPercentage, int healthValue, int itemType, int itemAmount, short itemDamage, Byte itemData, boolean little, boolean mount, boolean naked, boolean owned, Player[] owner, Ent passenger, boolean size, int sizeValue, boolean target, Player[] targets, boolean velocity, double velRandom, Vector velValue, boolean youth, int youthValue) {
+		super (null, alias, angry, bounce, color, colorCode, fireTicks, health, healthIsPercentage, healthValue, itemType, itemAmount, itemDamage, itemData, little, mount, naked, owned, owner, passenger, size, sizeValue, target, targets, velocity, velRandom, velValue, youth, youthValue);
 		this.people = people;
 	}
 
