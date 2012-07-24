@@ -265,6 +265,9 @@ public class Ent {
 			if (color)
 			{
 				Method colorMethod;
+				if (colorCode == null) {
+					colorCode = DyeColor.getByData((byte)(Math.random() * 16));
+				}
 				try
 				{
 					colorMethod = type.getMethod("setColor", DyeColor.class);

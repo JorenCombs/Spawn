@@ -667,7 +667,7 @@ public class Spawn extends JavaPlugin {
 							Byte itemData=null;
 							double velRandom=0;
 							Vector velValue = new Vector(0,0,0);
-							boolean setSize = false, health = false, healthIsPercentage = true, angry = false, bounce = false, color = false, little = false, mount = false, target = false, tame = false, naked = false, velocity = false, youth = false;
+							boolean setSize = false, health = false, healthIsPercentage = true, angry = false, bounce = false, color = false, colorRandom = false, little = false, mount = false, target = false, tame = false, naked = false, velocity = false, youth = false;
 							PlayerAlias targets=new PlayerAlias();
 							PlayerAlias owner=new PlayerAlias();
 							DyeColor colorCode=DyeColor.WHITE;
@@ -708,19 +708,24 @@ public class Spawn extends JavaPlugin {
 										if(allowedTo(sender, "spawn.color"))
 										{
 											color=true;
-											try
-											{
-												colorCode = DyeColor.getByData(Byte.parseByte(param));
-											}
-											catch (NumberFormatException e)
-											{
+											if (param == null) {
+												colorRandom = true;
+												colorCode = null;
+											} else {
 												try
 												{
-													colorCode = DyeColor.valueOf(DyeColor.class, param.toUpperCase());
-												} catch (IllegalArgumentException f)
+													colorCode = DyeColor.getByData(Byte.parseByte(param));
+												}
+												catch (NumberFormatException e)
 												{
-													sender.sendMessage(ChatColor.RED + "Color parameter must be a valid color or a number from 0 to 15.");
-													return false;
+													try
+													{
+														colorCode = DyeColor.valueOf(DyeColor.class, param.toUpperCase());
+													} catch (IllegalArgumentException f)
+													{
+														sender.sendMessage(ChatColor.RED + "Color parameter must be a valid color or a number from 0 to 15.");
+														return false;
+													}
 												}
 											}
 										}

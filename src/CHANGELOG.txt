@@ -1,3 +1,6 @@
+v0.2.7 - 2012-07-24
+- If color parameter is used without specifying a color, color will be random
+
 v0.2.6 - 2012-07-08
 - Uses Vault for permissions handling
 - Updated Spawn.yml for new mob types ("new" being relative :) )
