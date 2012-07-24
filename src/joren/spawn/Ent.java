@@ -265,13 +265,17 @@ public class Ent {
 			if (color)
 			{
 				Method colorMethod;
-				if (colorCode == null) {
-					colorCode = DyeColor.getByData((byte)(Math.random() * 16));
-				}
 				try
 				{
 					colorMethod = type.getMethod("setColor", DyeColor.class);
-					colorMethod.invoke(ent, colorCode);
+					if (colorCode == null) // Do a random color
+					{
+						colorMethod.invoke(ent, DyeColor.getByData((byte)(Math.random() * 16)));
+					}
+					else
+					{
+						colorMethod.invoke(ent, colorCode);
+					}
 				} catch (NoSuchMethodException e){}
 				catch (IllegalArgumentException e){}
 			}
